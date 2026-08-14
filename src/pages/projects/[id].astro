@@ -1,0 +1,87 @@
+---
+import ProseLayout from '../../layouts/ProseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('projects', ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const categoryLabel = {
+  current: 'Current Research',
+  side: 'Side Project',
+  archive: 'Archive',
+}[data.category];
+---
+
+<ProseLayout
+  title={data.title}
+  description={data.summary}
+  eyebrow={`${categoryLabel} · ${data.status}`}
+  date={data.date}
+  updated={data.updated}
+  tags={data.tags}
+  backHref="/projects/"
+  backLabel="All projects"
+>
+  <div class="frame">
+    <div>
+      <h3 class="label">Problem</h3>
+      <p>{data.problem}</p>
+    </div>
+    <div>
+      <h3 class="label">Approach</h3>
+      <p>{data.approach}</p>
+    </div>
+    <div>
+      <h3 class="label">What I learned</h3>
+      <p>{data.learned}</p>
+    </div>
+  </div>
+
+  <Content />
+
+  {data.links.length > 0 && (
+    <div class="links">
+      <h3 class="label">Links</h3>
+      <ul>
+        {data.links.map((l) => (
+          <li><a href={l.url}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  )}
+</ProseLayout>
+
+<style>
+  .frame {
+    display: grid;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-raised);
+  }
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 0 0 0.3rem;
+  }
+  .frame p {
+    margin: 0;
+  }
+  .links ul {
+    padding-left: 1.1em;
+  }
+</style>

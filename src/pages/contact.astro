@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// TODO: fill in your real links. Leave out any row you don't want shown.
+const links = [
+  { label: 'Email', value: 'you@example.com', href: 'mailto:you@example.com' },
+  { label: 'GitHub', value: '@SakethGG', href: 'https://github.com/SakethGG' },
+  { label: 'LinkedIn', value: 'TODO', href: 'https://linkedin.com/in/TODO' },
+  { label: 'X / Twitter', value: 'TODO', href: 'https://x.com/TODO' },
+];
+---
+
+<BaseLayout title="Contact" description="Get in touch." wide={false}>
+  <h1>Contact</h1>
+  <p class="lede">
+    If you're working on legged robotics, control theory, or anything adjacent to
+    embodied intelligence — <span class="accent">reach out</span>. I'm also happy to
+    talk about the research-institute idea if that's your kind of trouble.
+  </p>
+
+  <ul class="links">
+    {links.map((l) => (
+      <li>
+        <span class="mono label">{l.label}</span>
+        <a href={l.href}>{l.value}</a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
+
+<style>
+  .lede {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 34rem;
+    margin-bottom: 2.5rem;
+  }
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 26rem;
+  }
+  .links li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .label {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+</style>

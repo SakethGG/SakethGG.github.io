@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import EntryCard from '../../../components/EntryCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  const tags = new Set<string>();
+  notes.forEach((n) => n.data.tags.forEach((t) => tags.add(t)));
+  return [...tags].map((tag) => ({
+    params: { tag },
+    props: {
+      notes: notes
+        .filter((n) => n.data.tags.includes(tag))
+        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { tag } = Astro.params;
+const { notes } = Astro.props;
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<BaseLayout title={`#${tag}`} description={`Notes tagged #${tag}`}>
+  <a class="plain back mono" href="/notes/">&larr; All notes</a>
+  <h1>#{tag}</h1>
+  {notes.map((n) => (
+    <EntryCard
+      href={`/notes/${n.id}/`}
+      title={n.data.title}
+      meta={fmt(n.data.date)}
+      summary={n.data.summary}
+      tags={n.data.tags}
+    />
+  ))}
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+  }
+  .back:hover {
+    color: var(--accent);
+  }
+</style>

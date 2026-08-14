@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const people = (await getCollection('people', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout title="People" description="Short profiles of people who left an impression, and what specifically I learned from them.">
+  <header class="page-head">
+    <h1>People</h1>
+    <p class="muted">
+      Not bios — this is about the impact on how I think, not a CV of who these people are.
+    </p>
+  </header>
+
+  <section class="list">
+    {people.length === 0 && <p class="muted">Nothing here yet.</p>}
+    {people.map((p) => (
+      <a class="plain card" href={`/people/${p.id}/`}>
+        <h3>{p.data.name}</h3>
+        <p class="muted context">{p.data.context}</p>
+      </a>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+  }
+  .card {
+    display: block;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .card:hover h3 {
+    color: var(--accent);
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin: 0 0 0.3rem;
+  }
+  .context {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+</style>

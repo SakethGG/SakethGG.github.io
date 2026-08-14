@@ -1,0 +1,27 @@
+---
+import ProseLayout from '../../layouts/ProseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('people', ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+---
+
+<ProseLayout
+  title={data.name}
+  description={data.context}
+  eyebrow={data.context}
+  date={data.date}
+  backHref="/people/"
+  backLabel="All people"
+>
+  <Content />
+</ProseLayout>

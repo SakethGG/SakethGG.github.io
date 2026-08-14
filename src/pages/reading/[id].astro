@@ -1,0 +1,62 @@
+---
+import ProseLayout from '../../layouts/ProseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('reading', ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+const stars = (n?: number) => (n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '');
+---
+
+<ProseLayout
+  title={data.title}
+  description={data.takeaway}
+  eyebrow={`${data.kind === 'book' ? 'Book' : 'Paper'} · ${data.author}`}
+  date={data.date}
+  tags={data.tags}
+  backHref="/reading/"
+  backLabel="All reading"
+>
+  {data.rating && <p class="accent rating">{stars(data.rating)}</p>}
+  <div class="frame">
+    <h3 class="label">Takeaway</h3>
+    <p>{data.takeaway}</p>
+  </div>
+  <Content />
+  {data.link && (
+    <p><a href={data.link}>Original source &rarr;</a></p>
+  )}
+</ProseLayout>
+
+<style>
+  .rating {
+    font-size: 1rem;
+    margin-top: -1rem;
+  }
+  .frame {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-raised);
+  }
+  .frame p {
+    margin: 0;
+  }
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 0 0 0.3rem;
+  }
+</style>

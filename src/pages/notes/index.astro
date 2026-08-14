@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryCard from '../../components/EntryCard.astro';
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const tagCounts = new Map<string, number>();
+notes.forEach((n) => n.data.tags.forEach((t) => tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)));
+const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+
+<BaseLayout title="Notes" description="A digital garden — loose thoughts, half-formed ideas, things I'm chewing on.">
+  <header class="page-head">
+    <h1>Notes</h1>
+    <p class="muted">
+      This is the low-friction pile — loose thoughts and half-formed ideas, not polished
+      essays. Each one is marked <span class="evergreen">evergreen</span> (revised as I learn more)
+      or dated (a snapshot of what I thought at the time).
+    </p>
+    {tags.length > 0 && (
+      <div class="tag-row">
+        {tags.map(([t, count]) => (
+          <a class="tag" href={`/notes/tags/${t}/`}>#{t} <span class="muted">{count}</span></a>
+        ))}
+      </div>
+    )}
+  </header>
+
+  <section>
+    {notes.length === 0 && <p class="muted">Nothing here yet.</p>}
+    {notes.map((n) => (
+      <EntryCard
+        href={`/notes/${n.id}/`}
+        title={n.data.title}
+        meta={fmt(n.data.date)}
+        summary={n.data.summary}
+        tags={n.data.tags}
+        pill={n.data.evergreen ? 'Evergreen' : undefined}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+  }
+  .evergreen {
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>

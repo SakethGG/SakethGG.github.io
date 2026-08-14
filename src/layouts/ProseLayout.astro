@@ -1,0 +1,68 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  date?: Date;
+  updated?: Date;
+  tags?: string[];
+  backHref?: string;
+  backLabel?: string;
+}
+
+const { title, description, eyebrow, date, updated, tags = [], backHref, backLabel } = Astro.props;
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={title} description={description} wide={false}>
+  <article class="prose-article">
+    {backHref && (
+      <a class="plain back" href={backHref}>&larr; {backLabel ?? 'Back'}</a>
+    )}
+    <header class="article-head">
+      {eyebrow && <p class="pill">{eyebrow}</p>}
+      <h1>{title}</h1>
+      {(date || updated) && (
+        <p class="muted mono meta">
+          {date && fmt(date)}
+          {updated && <> · updated {fmt(updated)}</>}
+        </p>
+      )}
+      {tags.length > 0 && (
+        <div class="tag-row">
+          {tags.map((t) => (
+            <a class="tag" href={`/notes/tags/${t}/`}>#{t}</a>
+          ))}
+        </div>
+      )}
+    </header>
+    <div class="prose-body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .back {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 2rem;
+  }
+  .back:hover {
+    color: var(--accent);
+  }
+  .article-head {
+    margin-bottom: 2.5rem;
+  }
+  .meta {
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryCard from '../../components/EntryCard.astro';
+import { getCollection } from 'astro:content';
+
+const all = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const current = all.filter((p) => p.data.category === 'current');
+const side = all.filter((p) => p.data.category === 'side');
+const archive = all.filter((p) => p.data.category === 'archive');
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+---
+
+<BaseLayout
+  title="Projects & Research"
+  description="Current research, side projects, and an archive of paused or older work."
+>
+  <header class="page-head">
+    <h1>Projects &amp; Research</h1>
+    <p class="muted">
+      Each entry is written as problem &rarr; approach &rarr; what I learned &rarr; status,
+      not just a link to a repo or a paper.
+    </p>
+  </header>
+
+  <section>
+    <h2>Current Research</h2>
+    {current.length === 0 && <p class="muted">Nothing here yet.</p>}
+    {current.map((p) => (
+      <EntryCard
+        href={`/projects/${p.id}/`}
+        title={p.data.title}
+        meta={`${fmt(p.data.date)} · ${p.data.status}`}
+        summary={p.data.summary}
+        tags={p.data.tags}
+      />
+    ))}
+  </section>
+
+  <section>
+    <h2>Side Projects</h2>
+    {side.length === 0 && <p class="muted">Nothing here yet.</p>}
+    {side.map((p) => (
+      <EntryCard
+        href={`/projects/${p.id}/`}
+        title={p.data.title}
+        meta={`${fmt(p.data.date)} · ${p.data.status}`}
+        summary={p.data.summary}
+        tags={p.data.tags}
+      />
+    ))}
+  </section>
+
+  <section>
+    <h2>Archive</h2>
+    <p class="muted small">Older or paused work, kept here so the front stays uncluttered.</p>
+    {archive.length === 0 && <p class="muted">Nothing here yet.</p>}
+    {archive.map((p) => (
+      <EntryCard
+        href={`/projects/${p.id}/`}
+        title={p.data.title}
+        meta={`${fmt(p.data.date)} · ${p.data.status}`}
+        summary={p.data.summary}
+        tags={p.data.tags}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+  }
+  .small {
+    font-size: 0.85rem;
+    margin-top: -0.5rem;
+  }
+</style>

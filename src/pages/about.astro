@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="Background, what I'm focused on now, and the longer-term thing I'm building toward."
+  wide={false}
+>
+  <nav class="subnav mono" aria-label="On this page">
+    <a class="plain" href="#about">About</a>
+    <a class="plain" href="#now">Now</a>
+    <a class="plain" href="#vision">Vision</a>
+  </nav>
+
+  <section id="about">
+    <p class="pill">About</p>
+    <h1>Background</h1>
+    <!-- TODO: replace with your real story — undergrad at VIT Vellore, how you found
+         legged robotics, the path to Stochastic Robotics Lab, what pulled you in. -->
+    <p>
+      I did my undergrad at VIT Vellore, where a mix of robotics coursework and a
+      stubborn fascination with why animals walk so effortlessly pulled me toward
+      legged locomotion. That turned into work on quadruped and biped control —
+      actuators, whole-body control, trajectory optimization — and eventually into
+      research with the <strong>Stochastic Robotics Lab</strong> at IISc.
+    </p>
+    <p>
+      What keeps me here: legs are a hard control problem wearing a simple costume.
+      Everything — contact, uncertainty, real hardware that doesn't care about your
+      assumptions — shows up the moment a robot tries to take a step.
+    </p>
+  </section>
+
+  <section id="now">
+    <p class="pill">Now</p>
+    <h2>What I'm focused on this month</h2>
+    <p class="muted mono small">Last updated: <!-- TODO: keep this current --> August 2026</p>
+    <!-- TODO: replace with your actual current focus — e.g. the intern → RA
+         transition, a specific research thread (contact-implicit MPC, whole-body
+         control), a paper you're finishing. Update this every few weeks; it's the
+         thing that signals the site is alive. -->
+    <p>
+      Right now I'm moving from an internship into a Research Assistant role,
+      and most of my working hours go into one thread: making contact-implicit
+      MPC fast and reliable enough to run on real legged hardware, not just in
+      simulation. Everything else — notes, reading, side experiments — orbits
+      that.
+    </p>
+    <p class="muted">
+      This section is meant to go stale on purpose and then get rewritten —
+      that's the point. Check the date above.
+    </p>
+  </section>
+
+  <section id="vision">
+    <p class="pill">Vision</p>
+    <h2>What I'm building toward</h2>
+    <!-- TODO: this is the section almost nobody has — make it real. Replace with
+         your actual long-horizon thing, e.g. eventually founding an independent
+         research institute focused on legged robotics / embodied intelligence. -->
+    <p>
+      The longer arc: I'd like to eventually start an independent research lab —
+      small, opinionated, not beholden to a single funding cycle or publication
+      treadmill — built around the belief that embodied intelligence (robots that
+      actually have to deal with gravity, contact, and friction) is understudied
+      relative to how important it is. Everything I'm doing now, from the actuator
+      testbenches to the control theory notes, is scaffolding toward being able to
+      run something like that credibly.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .subnav {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+  }
+  .subnav a {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  .subnav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 2rem;
+  }
+  .small {
+    font-size: 0.78rem;
+  }
+</style>

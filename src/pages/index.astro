@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const reading = (await getCollection('reading', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const latestNote = notes[0];
+const latestProject = projects[0];
+const currentlyReading = reading[0];
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+---
+
+<BaseLayout title="closed loop" wide={false}>
+  <section class="intro">
+    <h1>Saketh Vegesna</h1>
+    <p class="lede">
+      I work on <span class="accent">legged robots</span> — the control and planning
+      problems that let a machine with legs stay upright, adapt, and move like it means it.
+      This is a small, honest corner of the internet where I keep the notes,
+      half-built ideas, and longer essays I'd otherwise lose to a notebook. Wander in.
+    </p>
+  </section>
+
+  <section class="doorway">
+    <h2 class="doorway-title mono">Recently</h2>
+    <div class="doorway-grid">
+      {latestNote && (
+        <a class="plain door" href={`/notes/${latestNote.id}/`}>
+          <p class="pill">Latest note</p>
+          <h3>{latestNote.data.title}</h3>
+          <p class="muted mono small">{fmt(latestNote.data.date)}</p>
+        </a>
+      )}
+      {latestProject && (
+        <a class="plain door" href={`/projects/${latestProject.id}/`}>
+          <p class="pill">Latest project</p>
+          <h3>{latestProject.data.title}</h3>
+          <p class="muted mono small">{fmt(latestProject.data.date)}</p>
+        </a>
+      )}
+      {currentlyReading && (
+        <a class="plain door" href={`/reading/${currentlyReading.id}/`}>
+          <p class="pill">Currently reading</p>
+          <h3>{currentlyReading.data.title}</h3>
+          <p class="muted mono small">{currentlyReading.data.author}</p>
+        </a>
+      )}
+    </div>
+  </section>
+
+  <nav class="jump" aria-label="Sections">
+    <a class="plain" href="/about/">About &amp; Now</a>
+    <a class="plain" href="/projects/">Projects &amp; Research</a>
+    <a class="plain" href="/notes/">Notes</a>
+    <a class="plain" href="/essays/">Essays</a>
+    <a class="plain" href="/reading/">Reading</a>
+    <a class="plain" href="/goals/">Goals</a>
+    <a class="plain" href="/people/">People</a>
+  </nav>
+</BaseLayout>
+
+<style>
+  .intro {
+    margin-bottom: 3.5rem;
+  }
+  .lede {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 38rem;
+  }
+  .doorway-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .doorway-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  .door {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    transition: border-color 0.15s ease;
+  }
+  .door:hover {
+    border-color: var(--accent);
+  }
+  .door h3 {
+    font-size: 1.05rem;
+    margin: 0.4rem 0 0.4rem;
+  }
+  .door:hover h3 {
+    color: var(--accent);
+  }
+  .small {
+    font-size: 0.78rem;
+  }
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .jump a {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .jump a:hover {
+    color: var(--accent);
+  }
+</style>

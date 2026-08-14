@@ -1,0 +1,35 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap-wide bar">
+    <p class="muted mono small">&copy; {year} Saketh Vegesna. Built with Astro, hosted on GitHub Pages.</p>
+    <p class="muted mono small"><a class="plain" href="/contact/">say hello</a></p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border);
+    margin-top: 5rem;
+  }
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .small {
+    font-size: 0.78rem;
+  }
+  a {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  a:hover {
+    color: var(--accent);
+  }
+</style>
