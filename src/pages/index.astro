@@ -21,16 +21,16 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 
 <BaseLayout title="closed loop" wide={false}>
   <section class="intro">
-    <div class="intro-heading">
-      <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="72" height="72" />
+    <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="220" height="220" />
+    <div class="intro-text">
       <h1>Saketh Vegesna</h1>
+      <p class="lede">
+        I work on <span class="accent">legged robots</span> — the control and planning
+        problems that let a machine with legs stay upright, adapt, and move like it means it.
+        This is a small, honest corner of the internet where I keep the notes,
+        half-built ideas, and longer essays I'd otherwise lose to a notebook. Wander in.
+      </p>
     </div>
-    <p class="lede">
-      I work on <span class="accent">legged robots</span> — the control and planning
-      problems that let a machine with legs stay upright, adapt, and move like it means it.
-      This is a small, honest corner of the internet where I keep the notes,
-      half-built ideas, and longer essays I'd otherwise lose to a notebook. Wander in.
-    </p>
   </section>
 
   <section class="doorway">
@@ -73,22 +73,32 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 
 <style>
   .intro {
-    margin-bottom: 3.5rem;
-  }
-  .intro-heading {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2.5rem;
+    margin-bottom: 3.5rem;
   }
   .avatar {
-    width: 72px;
-    height: 72px;
+    flex-shrink: 0;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid var(--border);
   }
-  .intro-heading h1 {
-    margin: 0;
+  .intro-text h1 {
+    margin: 0 0 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .intro {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+    .avatar {
+      width: 140px;
+      height: 140px;
+    }
   }
   .lede {
     font-size: 1.15rem;
