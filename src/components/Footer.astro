@@ -3,9 +3,21 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="wrap-wide bar">
-    <p class="muted mono small">&copy; {year} Saketh Vegesna. Built with Astro, hosted on GitHub Pages.</p>
-    <p class="muted mono small"><a class="plain" href="/contact/">say hello</a></p>
+  <div class="wrap-wide">
+    <blockquote class="quote">
+      <p>
+        "A human being should be able to change a diaper, plan an invasion, butcher a hog,
+        conn a ship, design a building, write a sonnet, balance accounts, build a wall, set a
+        bone, comfort the dying, take orders, give orders, cooperate, act alone, solve
+        equations, analyze a new problem, pitch manure, program a computer, cook a tasty
+        meal, fight efficiently, die gallantly. Specialization is for insects."
+      </p>
+      <cite>— Robert A. Heinlein</cite>
+    </blockquote>
+    <div class="bar">
+      <p class="muted mono small">&copy; {year} Saketh Vegesna. Built with Astro, hosted on GitHub Pages.</p>
+      <p class="muted mono small"><a class="plain" href="/contact/">say hello</a></p>
+    </div>
   </div>
 </footer>
 
@@ -13,6 +25,25 @@ const year = new Date().getFullYear();
   .site-footer {
     border-top: 1px solid var(--border);
     margin-top: 5rem;
+  }
+  .quote {
+    margin: 0;
+    padding: 1.5rem 1.5rem 0;
+    text-align: center;
+  }
+  .quote p {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 42rem;
+    margin: 0 auto 0.6rem;
+  }
+  .quote cite {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-style: normal;
+    color: var(--muted);
   }
   .bar {
     display: flex;
