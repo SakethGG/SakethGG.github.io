@@ -21,7 +21,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 
 <BaseLayout title="closed loop" wide={false}>
   <section class="intro">
-    <h1>Saketh Vegesna</h1>
+    <div class="intro-heading">
+      <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="72" height="72" />
+      <h1>Saketh Vegesna</h1>
+    </div>
     <p class="lede">
       I work on <span class="accent">legged robots</span> — the control and planning
       problems that let a machine with legs stay upright, adapt, and move like it means it.
@@ -71,6 +74,21 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 <style>
   .intro {
     margin-bottom: 3.5rem;
+  }
+  .intro-heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+  }
+  .intro-heading h1 {
+    margin: 0;
   }
   .lede {
     font-size: 1.15rem;
