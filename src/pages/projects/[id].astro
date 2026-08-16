@@ -31,21 +31,6 @@ const categoryLabel = {
   backHref="/projects/"
   backLabel="All projects"
 >
-  <div class="frame">
-    <div>
-      <h3 class="label">Problem</h3>
-      <p>{data.problem}</p>
-    </div>
-    <div>
-      <h3 class="label">Approach</h3>
-      <p>{data.approach}</p>
-    </div>
-    <div>
-      <h3 class="label">What I learned</h3>
-      <p>{data.learned}</p>
-    </div>
-  </div>
-
   <Content />
 
   {data.links.length > 0 && (
@@ -61,15 +46,6 @@ const categoryLabel = {
 </ProseLayout>
 
 <style>
-  .frame {
-    display: grid;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    margin-bottom: 2.5rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg-raised);
-  }
   .label {
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -77,9 +53,6 @@ const categoryLabel = {
     letter-spacing: 0.06em;
     color: var(--accent);
     margin: 0 0 0.3rem;
-  }
-  .frame p {
-    margin: 0;
   }
   .links ul {
     padding-left: 1.1em;

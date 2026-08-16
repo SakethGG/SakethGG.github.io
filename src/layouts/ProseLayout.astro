@@ -65,4 +65,18 @@ const fmt = (d: Date) =>
     font-size: 0.85rem;
     margin-top: 0.4rem;
   }
+  .prose-body :global(.katex) {
+    font-size: 0.85em;
+  }
+  .prose-body :global(.eq-row) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem 2.5rem;
+    margin: 1em 0;
+  }
+  .prose-body :global(.eq-row .katex-display) {
+    margin: 0;
+  }
 </style>

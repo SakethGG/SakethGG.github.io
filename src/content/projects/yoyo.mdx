@@ -1,0 +1,124 @@
+---
+title: "Yo-Yo!! What's Up?"
+category: side
+status: active
+summary: "Designing and manufacturing a yo-yo from first principles — working through the rotational dynamics before touching CAD."
+tags: ["physics", "manufacturing", "mechanical-design", "fun"]
+date: 2026-08-16
+links: []
+---
+
+So here I am, finally, I have reached home. It took Odysseus 10 years to reach his home of Ithaca after the end of the Trojan War. And it took me 22 years to reach mine. I will be putting my thoughts on this page. I will write about my projects, thoughts, and other interesting topics. So this is going to be the first thing I write here. I also plan to bring my old projects and thoughts here.
+
+It is really funny how time flies so quickly. I will be graduating in about a week with a mechanical engineering degree. So why not make a project on designing and manufacturing a yo-yo? This is one of my favourite things to play with when I was a kid, but I was never good at it. But this morning I found a yo-yo at my cousin's place and surprisingly, I can yo-yo somehow.
+
+So I am going to design and manufacture a perfect yo-yo; before I do that, let's figure out how a yo-yo works.
+
+A modern yo-yo consists of 2 halves, one axle and a string.
+
+The fundamental concept behind it is the conversion of energy. It converts gravitational potential energy into translational and rotational kinetic energy.
+
+So when you release a yo-yo from your hand, it falls down due to gravity. Gravity is responsible for the translational motion, but gravity is not directly responsible for the rotational motion. Let me explain.
+
+When we release the yo-yo, the stored gravitational potential energy is converted to translational kinetic energy and rotational kinetic energy:
+
+<div class="eq-row">
+
+$$
+K_{\text{trans}}=\frac{1}{2}mv^2
+$$
+
+$$
+K_{\text{rot}}=\frac{1}{2}I\omega^2
+$$
+
+</div>
+
+So some of the gravitational energy goes into linear motion and some goes into rotational motion.
+
+![Yo-yo](/images/projects/yoyo/yoyo-01.jpg)
+
+Now how does it rotate? The string is wound around the axle and exerts a tangential tension force at a distance $r$ from the axis. Considering the string is perpendicular to the radius, the torque is given as:
+
+$$
+\tau=rT\sin(\theta)
+$$
+
+Here $\theta$ is $90^\circ$ as it is perpendicular, so:
+
+$$
+\tau=rT
+$$
+
+Now we know rotational Newton's second law:
+
+$$
+\tau=I\alpha
+$$
+
+Therefore, we get:
+
+$$
+\alpha=\frac{rT}{I}
+$$
+
+which implies that, for a given torque, $\alpha$ is inversely proportional to $I$.
+
+As gravity acts through the centre of mass of the body, it does not create any torque about the centre of mass. The tension in the string creates both linear and angular acceleration.
+
+As the string unwinds without slipping:
+
+<div class="eq-row">
+
+$$
+v=r\omega
+$$
+
+$$
+a=r\alpha
+$$
+
+</div>
+
+Now, designing it considering the moment of inertia is crucial, as mass located far from the axis contributes disproportionately to $I$. So clustering mass at the extremities makes it more resistant to changes in rotational speed. Also, the radius of the axle influences the descent behaviour.
+
+From the equations of motion, we get:
+
+$$
+a=\frac{g}{1+\frac{I}{mr^2}}
+$$
+
+So if $r$ is small, $a$ is also smaller, and vice versa.
+
+Now why does the yo-yo come back up? When the yo-yo is at the bottom, it still has plenty of rotational kinetic energy and angular momentum. If you give it a small jerk, the increased tension in the string produces a torque on the axle, causing the string to wind itself back up. The rotating yo-yo is essentially acting like a small spool winding the string around the axle.
+
+![Yo-yo](/images/projects/yoyo/yoyo-02.jpg)
+
+Also, if the yo-yo is spinning at the end of the string without climbing back up, this position is called "sleeping" in the yo-yoing community. This happens when the yo-yo has sufficient angular momentum, which makes it difficult to change its rotational state easily.
+
+Modern yo-yos have bearings on the axle, while the old ones have the string directly sitting on and rubbing against the axle, creating significant friction. This causes rotational energy to be lost as heat. A ball bearing reduces this unwanted friction by allowing the yo-yo body to rotate relative to the axle with much lower resistance. This ensures there is plenty of sleep time for doing tricks.
+
+Also, I have observed that modern yo-yos are usually wider. I wondered why? Is there a reason for this? Sure, wider yo-yos provide larger separation between the two halves, making them ideal for tricks. The larger gap gives more space for the string to move around, and the geometry of the string interaction changes as well. Width can also influence the mass distribution and therefore the moment of inertia, but width itself does not automatically make a yo-yo more stable.
+
+Now let's actually design it while considering physics:
+
+### 1. Moment of Inertia
+
+Although having more mass at the extremities increases the moment of inertia, thus increasing the angular momentum and rotational kinetic energy for a given angular velocity, it is harder for us to accelerate it rotationally. So this is a trade-off:
+
+| High $I$ | Low $I$ |
+| --- | --- |
+| High angular momentum | Easier to accelerate |
+| Longer spin retention | More responsive |
+| Better resistance to changes in rotational speed | Lower angular momentum for the same $\omega$ |
+| Harder to accelerate | Loses rotational speed more readily |
+
+Also, when I see Alex Hattori perform tricks, I observe how good he is at controlling it, but it is imperative to give credit to angular momentum as well. Explore the gyroscopic effect concept to understand this better.
+
+Obviously, the player's control, timing, and understanding of the string are incredibly important. But the yo-yo itself is also doing some serious physics. Angular momentum, rotational inertia, torque, friction, and the geometry of the string are all working together.
+
+So now I have a better question to answer:
+
+What would my "perfect" yo-yo actually look like?
+
+Let's find out.
