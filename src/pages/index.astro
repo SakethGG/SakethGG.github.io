@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { publications } from '../data/publications';
 
 const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -8,13 +9,8 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
 const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-const reading = (await getCollection('reading', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-
 const latestNote = notes[0];
 const latestProject = projects[0];
-const currentlyReading = reading[0];
 
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 ---
@@ -50,14 +46,24 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
           <p class="muted mono small">{fmt(latestProject.data.date)}</p>
         </a>
       )}
-      {currentlyReading && (
-        <a class="plain door" href={`/reading/${currentlyReading.id}/`}>
-          <p class="pill">Currently reading</p>
-          <h3>{currentlyReading.data.title}</h3>
-          <p class="muted mono small">{currentlyReading.data.author}</p>
-        </a>
-      )}
     </div>
+  </section>
+
+  <section class="pubs">
+    <h2 class="doorway-title mono">Publications</h2>
+    <ul class="pub-list">
+      {publications.map((p) => (
+        <li class="pub">
+          {p.link ? (
+            <a class="plain" href={p.link}>{p.title}</a>
+          ) : (
+            <span>{p.title}</span>
+          )}
+          <p class="muted small">{p.authors} — {p.venue}, {p.year}</p>
+          <p class="pub-status mono small">{p.status.replace('-', ' ')}</p>
+        </li>
+      ))}
+    </ul>
   </section>
 
   <nav class="jump" aria-label="Sections">
@@ -65,7 +71,6 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     <a class="plain" href="/projects/">Projects &amp; Research</a>
     <a class="plain" href="/notes/">Notes</a>
     <a class="plain" href="/essays/">Essays</a>
-    <a class="plain" href="/reading/">Reading</a>
     <a class="plain" href="/goals/">Goals</a>
     <a class="plain" href="/people/">People</a>
   </nav>
@@ -136,6 +141,34 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
   }
   .small {
     font-size: 0.78rem;
+  }
+  .pubs {
+    margin-bottom: 3rem;
+  }
+  .pub-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+  .pub {
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .pub:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .pub a {
+    font-weight: 600;
+  }
+  .pub-status {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-top: 0.25rem;
   }
   .jump {
     display: flex;

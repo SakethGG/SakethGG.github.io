@@ -36,23 +36,6 @@ const notes = defineCollection({
     }),
 });
 
-// Reading — books and papers share a shape, `kind` distinguishes them.
-const reading = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/reading' }),
-  schema: () =>
-    z.object({
-      title: z.string(),
-      kind: z.enum(['book', 'paper']),
-      author: z.string(),
-      link: z.string().optional(),
-      rating: z.number().min(1).max(5).optional(),
-      takeaway: z.string(),
-      date: z.coerce.date(),
-      tags: z.array(z.string()).default([]),
-      draft: z.boolean().default(false),
-    }),
-});
-
 // Essays — long-form, polished, rare.
 const essays = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/essays' }),
@@ -80,4 +63,4 @@ const people = defineCollection({
     }),
 });
 
-export const collections = { projects, notes, reading, essays, people };
+export const collections = { projects, notes, essays, people };
