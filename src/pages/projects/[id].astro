@@ -19,12 +19,14 @@ const categoryLabel = {
   side: 'Side Project',
   archive: 'Archive',
 }[data.category];
+
+const statusLabel = data.status === 'shipped' ? 'completed' : data.status;
 ---
 
 <ProseLayout
   title={data.title}
   description={data.summary}
-  eyebrow={`${categoryLabel} · ${data.status}`}
+  eyebrow={`${categoryLabel} · ${statusLabel}`}
   date={data.date}
   updated={data.updated}
   tags={data.tags}

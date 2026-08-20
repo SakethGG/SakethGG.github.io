@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const archive = (await getCollection('projects', ({ data }) => !data.draft && data.category === 'archive')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+---
+
+<BaseLayout
+  title="Archive"
+  description="Older or paused projects, kept out of the way of the main projects page."
+>
+  <a class="plain back" href="/projects/">&larr; All projects</a>
+  <header class="page-head">
+    <h1>Archive</h1>
+    <p class="muted">Older or paused work, kept here so the main projects page stays uncluttered.</p>
+  </header>
+
+  {archive.length === 0 && <p class="muted">Nothing here yet.</p>}
+  <ul class="archive-list">
+    {archive.map((p) => (
+      <li class="archive-row">
+        <span class="muted mono archive-date">{fmt(p.data.date)}</span>
+        <a href={`/projects/${p.id}/`}>{p.data.title}</a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
+
+<style>
+  .back {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 2rem;
+  }
+  .back:hover {
+    color: var(--accent);
+  }
+  .page-head {
+    margin-bottom: 2rem;
+  }
+  .archive-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .archive-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .archive-date {
+    flex-shrink: 0;
+    width: 6.5rem;
+    font-size: 0.85rem;
+  }
+</style>

@@ -54,25 +54,26 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     <ul class="pub-list">
       {publications.map((p) => (
         <li class="pub">
-          {p.link ? (
-            <a class="plain" href={p.link}>{p.title}</a>
-          ) : (
-            <span>{p.title}</span>
-          )}
-          <p class="muted small">{p.authors} — {p.venue}, {p.year}</p>
-          <p class="pub-status mono small">{p.status.replace('-', ' ')}</p>
+          {p.image && <img class="pub-thumb" src={p.image} alt="" loading="lazy" />}
+          <div class="pub-text">
+            {p.link ? (
+              <a class="plain" href={p.link}>{p.title}</a>
+            ) : (
+              <span>{p.title}</span>
+            )}
+            <p class="muted small">{p.authors} — {p.venue}, {p.year}</p>
+            <p class="pub-status mono small">{p.status.replace('-', ' ')}</p>
+          </div>
         </li>
       ))}
     </ul>
   </section>
 
   <nav class="jump" aria-label="Sections">
-    <a class="plain" href="/about/">About &amp; Now</a>
     <a class="plain" href="/projects/">Projects &amp; Research</a>
     <a class="plain" href="/notes/">Notes</a>
     <a class="plain" href="/essays/">Essays</a>
-    <a class="plain" href="/goals/">Goals</a>
-    <a class="plain" href="/people/">People</a>
+    <a class="plain" href="/about/">About &amp; Now</a>
   </nav>
 </BaseLayout>
 
@@ -154,12 +155,26 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     gap: 1.1rem;
   }
   .pub {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
     padding-bottom: 1.1rem;
     border-bottom: 1px solid var(--border);
   }
   .pub:last-child {
     border-bottom: none;
     padding-bottom: 0;
+  }
+  .pub-thumb {
+    flex-shrink: 0;
+    width: 8rem;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .pub-text {
+    min-width: 0;
   }
   .pub a {
     font-weight: 600;
@@ -169,6 +184,15 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     letter-spacing: 0.04em;
     color: var(--accent);
     margin-top: 0.25rem;
+  }
+  @media (max-width: 480px) {
+    .pub {
+      flex-direction: column;
+    }
+    .pub-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
   }
   .jump {
     display: flex;

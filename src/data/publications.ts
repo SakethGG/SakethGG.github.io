@@ -8,6 +8,7 @@ export interface Publication {
   year: string;
   status: 'published' | 'in-review' | 'in-prep';
   link?: string;
+  image?: string;
 }
 
 export const publications: Publication[] = [
@@ -17,5 +18,6 @@ export const publications: Publication[] = [
     venue: 'Venue / journal / conference name',
     year: '2026',
     status: 'in-prep',
+    // image: '/images/publications/sample.jpg',
   },
 ];

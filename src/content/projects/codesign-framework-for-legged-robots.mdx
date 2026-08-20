@@ -1,0 +1,25 @@
+---
+title: "Co-design Framework for Legged Robots"
+category: current
+status: active
+summary: "Bilevel co-design of actuators and controllers for legged robots — optimizing link lengths against a torque/tracking cost through a differentiable inner-loop controller."
+tags: ["co-design", "legged-robots", "optimization", "control"]
+date: 2026-06-25
+links:
+  - { label: "GitHub", url: "https://github.com/SakethGG/Codesign-framework-for-legged-robots" }
+---
+
+A 2-DOF planar leg testbed for co-designing robot link lengths `[L1, L2]` against a torque/tracking
+cost, following De Vincenti, Kang & Coors (ICRA 2023). It couples two nested optimization loops:
+
+- **Inner loop** — a per-timestep QP (solved via OSQP) computes joint accelerations and torques
+  jointly for an operational-space PD task-tracking controller, simulated forward in MuJoCo.
+- **Outer loop** — LBFGS++ optimizes the link lengths against the accumulated cost (squared mean
+  actuator effort), using gradients from analytic KKT differentiation of the QP — an OptNet-style
+  implicit differentiation of the inner controller — plus finite-difference-verified dynamics
+  partials.
+
+The interesting part is the KKT sensitivity: instead of treating the inner-loop controller as a
+black box and finite-differencing through the whole simulation, the gradient of the outer cost
+with respect to the design variables is propagated analytically through the QP's optimality
+conditions.

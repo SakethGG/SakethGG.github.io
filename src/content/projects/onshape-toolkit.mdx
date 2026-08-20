@@ -1,0 +1,16 @@
+---
+title: "Onshape Toolkit"
+category: archive
+status: shipped
+summary: "A Python toolkit for programmatic control of Onshape CAD models — reading and updating parametric variables through the Onshape REST API instead of clicking through menus."
+tags: ["cad", "automation", "python", "tooling"]
+date: 2026-02-27
+links:
+  - { label: "GitHub", url: "https://github.com/SakethGG/Onshape_Toolkit" }
+---
+
+Built while working on actuator and mechanism design, where manually updating link lengths across
+dozens of configurations wasn't sustainable. This toolkit treats an Onshape CAD model as a
+programmable object: authenticate over HMAC-SHA256, traverse documents and Variable Studios, and
+read or push type-aware variable updates (`LENGTH`, `ANGLE`, `NUMBER`) straight from Python — turning
+a parametric sweep into a script instead of an afternoon of clicking.

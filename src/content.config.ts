@@ -51,16 +51,4 @@ const essays = defineCollection({
     }),
 });
 
-// People — short profiles of people who left an impression.
-const people = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/people' }),
-  schema: () =>
-    z.object({
-      name: z.string(),
-      context: z.string(),
-      date: z.coerce.date(),
-      draft: z.boolean().default(false),
-    }),
-});
-
-export const collections = { projects, notes, essays, people };
+export const collections = { projects, notes, essays };

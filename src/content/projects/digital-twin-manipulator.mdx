@@ -1,0 +1,19 @@
+---
+title: "Digital Twin Manipulator"
+category: archive
+status: shipped
+summary: "A MATLAB/Simulink digital twin of the Universal Robots UR5 — kinematics, dynamics, LuGre friction, and trajectory generation, built to validate motion offline before touching real hardware."
+tags: ["manipulators", "digital-twin", "matlab", "simulation"]
+date: 2025-02-06
+links:
+  - { label: "GitHub", url: "https://github.com/SakethGG/Digital-Twin-Manipulator" }
+---
+
+A MATLAB/Simulink digital twin of the UR5 six-DOF manipulator, covering forward and inverse
+kinematics, rigid-body dynamics, LuGre friction modelling, trajectory generation through Cartesian
+waypoints, and 3D animation of the resulting motion.
+
+The goal was a simulation model faithful enough to be used for offline trajectory validation,
+controller tuning, and torque/friction analysis before running anything on the real arm — kinematics
+and dynamics through MATLAB's Robotics System Toolbox, friction and position control through
+Simscape Multibody.
