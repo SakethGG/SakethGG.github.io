@@ -1,0 +1,34 @@
+---
+title: "AI Jargon 101"
+date: 2026-08-30
+evergreen: false
+tags: ["ai", "llm", "jargon"]
+summary: "A rough overview of the core terms behind LLMs and agents — weights, parameters, models, harnesses, agents, and tokens."
+---
+
+Although I don't primarily work in Artificial Intelligence, I have learned a lot through experience and curiosity. This blog is just a rough overview of AI and its details.
+
+These are important terms to be aware of:
+
+1. Weights:
+All LLMs (Large Language Models) are built from a network of neurons which are interconnected to each other via layers in a really interesting manner. Now, each connection has a number attached to it — this is a weight. This tells a neuron how it should respond to an input. When information flows through it, the weight gets multiplied by the neuron's output before being passed to the next one.
+
+2. Parameters:
+Adjustable numbers in a model — so all the weights plus some biases. The larger the parameter count, the more capable the model tends to be. Training is just the process of fine-tuning these numbers. At first, the values are random. When we train the model, we show it text, rate its response, and give it a chance to correct itself — every one of the billions of values is slightly changed, and we do this trillions of times to make it better. At the end, it can write with correct grammar, reason through things, etc. More parameters means more capacity to store patterns, and hence requires more memory to run.
+
+3. Model:
+A trained neural network with fixed weights and parameters. It is like a brain: it can take in text and predict the next word. It has no memory and can't take any actions on its own — it needs its body, the "Harness."
+
+4. Harness:
+This is the harness, which keeps the model in check and makes it actually do some useful stuff. It manages tools, sends results back, stores data for context, and gives permissions to the model. The harness is fixed — it does not care which model it is running.
+
+5. Agent:
+An agent is the combination of a model running inside a harness. It works towards a goal by taking actions — within the permissions it's been given — until the task is done.
+
+6. Tokens:
+Text gets broken down into tokens — roughly ¾ of a word is one token — for both processing and billing. The models don't read letter by letter or word by word. A tokenizer, which is built using an algorithm called Byte Pair Encoding, is trained ahead of time on a huge amount of text to find the most common recurring chunks and build a fixed vocabulary. Once text is tokenised, it is converted to numbers — an embedding vector — and this is what actually flows through a neural network and gets multiplied with the weights.
+
+Why is there a limit on tokens?
+Context windows are limited mainly because the attention mechanism's compute cost grows quadratically with token count, and longer contexts also demand much more GPU memory to cache what's already been processed. On top of that, models are trained and tuned for a specific length, and reliability can drop beyond it. More tokens mean higher cost and slower responses.
+
+There are mainly two ways you can work with "AI Agents": you can either deploy open-source models on your local hardware setup, or use an application like Claude or ChatGPT, which comes with model + harness + safety + UI all bundled.
