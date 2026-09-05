@@ -10,11 +10,25 @@ links:
   - { label: "GitHub", url: "https://github.com/SakethGG/Codesign-framework-for-legged-robots" }
 ---
 
-Convex Model Predictive Control on both a biped and a quadruped:
 
-<video src="/images/projects/codesign-framework-for-legged-robots/biped.mov" controls style="max-width: 100%; border-radius: 8px;"></video>
+Track 1: 
 
-<video src="/images/projects/codesign-framework-for-legged-robots/quadruped.mov" controls style="max-width: 100%; border-radius: 8px;"></video>
+CMA-ES (Covariance Matrix Adaptation Evolution Strategy) is a derivative-free stochastic optimizer
+for continuous, non-convex, and potentially noisy objective functions — well suited to expensive
+black-box problems where gradients are unavailable, unreliable, or hard to compute. It works by
+maintaining a multivariate Gaussian search distribution and adapting it generation over generation:
+
+- **Sample** — candidate solutions are drawn from a Gaussian parameterized by a mean vector, a
+  global step size, and a covariance matrix.
+- **Evaluate & select** — each candidate is scored against the objective function, and the
+  highest-performing ones are used to update the distribution mean.
+- **Adapt the covariance** — the covariance matrix learns the scaling and correlations between
+  optimization variables, effectively capturing the local geometry of the search landscape.
+- **Adapt the step size** — a separate mechanism controls the overall exploration radius, balancing
+  global exploration against local refinement.
+
+Repeated over generations, the search distribution evolves toward regions of increasingly
+favorable fitness.
 
 
 Track 2: 
