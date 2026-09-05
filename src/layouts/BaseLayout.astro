@@ -49,9 +49,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <script is:inline>
       // Runs before paint to avoid a flash of the wrong theme.
+      // Always defaults to light unless the visitor has explicitly toggled dark mode before.
       const stored = localStorage.getItem('theme');
-      const theme =
-        stored ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const theme = stored === 'dark' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', theme);
     </script>
   </head>
