@@ -17,7 +17,10 @@ const isActive = (href: string) =>
 
 <header class="site-header">
   <div class="wrap-wide bar">
-    <a href="/" class="plain wordmark">closed loop<span class="dot">.</span></a>
+    <a href="/" class="plain wordmark">
+      <span class="glow-dot mark" aria-hidden="true"></span>
+      closed loop<span class="dot">.</span>
+    </a>
     <nav aria-label="Primary">
       <ul>
         {links.map((l) => (
@@ -46,10 +49,20 @@ const isActive = (href: string) =>
     flex-wrap: wrap;
   }
   .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     font-family: var(--font-display);
+    font-style: italic;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
     white-space: nowrap;
+  }
+  .mark {
+    width: 1.4rem;
+    height: 1.4rem;
+    flex-shrink: 0;
   }
   .dot {
     color: var(--accent);
@@ -70,13 +83,15 @@ const isActive = (href: string) =>
     font-family: var(--font-mono);
     font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     color: var(--muted);
     text-decoration: none;
     white-space: nowrap;
+    transition: color 0.15s ease, text-shadow 0.15s ease;
   }
   .nav-link:hover {
     color: var(--accent);
+    text-shadow: 0 0 8px var(--glow);
   }
   .nav-link.active {
     color: var(--fg);

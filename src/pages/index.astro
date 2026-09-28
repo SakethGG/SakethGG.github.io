@@ -17,7 +17,12 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 
 <BaseLayout title="closed loop" wide={false}>
   <section class="intro">
-    <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="280" height="280" />
+    <span class="smoke smoke-1" aria-hidden="true"></span>
+    <span class="smoke smoke-2" aria-hidden="true"></span>
+    <div class="avatar-frame">
+      <span class="halo avatar-halo" aria-hidden="true"></span>
+      <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="280" height="280" />
+    </div>
     <div class="intro-text">
       <h1>Saketh Vegesna</h1>
       <p class="lede">
@@ -79,13 +84,38 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 
 <style>
   .intro {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 2.5rem;
     margin-bottom: 3.5rem;
   }
-  .avatar {
+  .smoke {
+    width: 16rem;
+    height: 16rem;
+  }
+  .smoke-1 {
+    top: -4rem;
+    left: -2rem;
+  }
+  .smoke-2 {
+    top: 2rem;
+    right: 10%;
+    animation-delay: -7s;
+  }
+  .avatar-frame {
+    position: relative;
     flex-shrink: 0;
+    width: 280px;
+    height: 280px;
+  }
+  .avatar-halo {
+    inset: -30px;
+    z-index: 0;
+  }
+  .avatar {
+    position: relative;
+    z-index: 1;
     width: 280px;
     height: 280px;
     border-radius: 50%;
@@ -101,6 +131,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
       flex-direction: column;
       align-items: flex-start;
       gap: 1.5rem;
+    }
+    .avatar-frame {
+      width: 180px;
+      height: 180px;
     }
     .avatar {
       width: 180px;

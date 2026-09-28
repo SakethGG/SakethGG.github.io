@@ -4,7 +4,7 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="wrap-wide bar">
-    <p class="muted mono small">&copy; {year} Saketh Vegesna.</p>
+    <p class="muted mono small"><span class="glow-dot"></span> &copy; {year} Saketh Vegesna.</p>
     <p class="muted mono small"><a class="plain" href="/contact/">say hello</a></p>
   </div>
 </footer>
@@ -13,6 +13,7 @@ const year = new Date().getFullYear();
   .site-footer {
     border-top: 1px solid var(--border);
     margin-top: 5rem;
+    background: linear-gradient(to bottom, transparent, var(--bg-raised));
   }
   .bar {
     display: flex;
@@ -23,6 +24,9 @@ const year = new Date().getFullYear();
     flex-wrap: wrap;
   }
   .small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.78rem;
   }
   a {
