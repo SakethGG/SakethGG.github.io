@@ -1,7 +1,7 @@
 ---
 title: "Reviving a Dismantled 3D Printer"
-category: side
-status: active
+category: archive
+status: shipped
 summary: "Found a scrapped, half-disassembled Ender 3 V2 in the lab. Figuring out what's missing and what's broken before trying to bring it back to life."
 tags: ["3d-printing", "hardware", "repair", "electronics"]
 date: 2026-08-24
@@ -36,3 +36,15 @@ I did some research online, and there are a lot of components missing, not only 
 I am checking whether the motherboard of the printer is actually working by controlling a single stepper motor. I am using Pronterface to send and receive commands. I wrote G-code, and you can see it is working fine, so I can rule out the board being an issue, which is a relief.
 
 <video src="/images/projects/3d-printer-revival/stepper-motor-test.mov" controls style="max-width: 100%; border-radius: 8px;"></video>
+
+The main issue was the JST connector one of its terminals was pretty loose, which created a weak connection, so I had to replace it with a new one. I also noticed that any break in the stepper motor wires creates jittery motion; the only fix is to use a single, unbroken wire, secured with solder or tape. I also had to replace one stepper motor, since its rotor wasn't sitting concentric, which made it difficult to rotate.
+
+![](/images/projects/3d-printer-revival/printer-07.jpg)
+
+<video src="/images/projects/3d-printer-revival/connector-repair.mov" controls style="max-width: 100%; border-radius: 8px;"></video>
+
+Now every axis is working fine the only problem is it still doesn't have a screen. When I checked online, screens are really expensive, and I don't see myself using this printer much, so I think I'll just send the G-code directly from my computer instead.
+
+The other problem is that the extruder stepper motor is missing a few components, which are quite expensive. I want to leave this project here for now, as I don't want to spend a lot of money on it.
+
+Then why go through all the trouble in the first place? I have other plans for this setup I want to build a Text writing machine that can replicate my handwriting using machine learning. I'll start that project in some time, as I have a lot on my hands right now.
