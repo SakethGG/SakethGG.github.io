@@ -21,7 +21,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     <div class="intro-text">
       <h1>Saketh Vegesna</h1>
       <p class="lede">
-        I work on <span class="accent">legged robots</span> — the control and planning
+        I work on <span class="accent">legged robots</span>: the control and planning
         problems that let a machine with legs stay upright, adapt, and move like it means it.
         This is a small, honest corner of the internet where I keep the notes,
         half-built ideas, and longer essays I'd otherwise lose to a notebook. Wander in.
@@ -61,7 +61,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
             ) : (
               <span>{p.title}</span>
             )}
-            <p class="muted small">{p.authors} — {p.venue}, {p.year}</p>
+            <p class="muted small">{p.authors}, {p.venue}, {p.year}</p>
             <p class="pub-status mono small">{p.status.replace('-', ' ')}</p>
           </div>
         </li>

@@ -10,7 +10,7 @@ const essays = (await getCollection('essays', ({ data }) => !data.draft)).sort(
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
-<BaseLayout title="Essays" description="Longer-form writing — opinions and arguments I've actually reasoned through.">
+<BaseLayout title="Essays" description="Longer-form writing: opinions and arguments I've actually reasoned through.">
   <header class="page-head">
     <h1>Essays</h1>
     <p class="muted">Long-form and rare, on purpose. Where the notes get argued into a position.</p>

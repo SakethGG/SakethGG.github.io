@@ -1,7 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// Projects & Research — category splits Current Research / Side Projects / Archive
+// Projects & Research: category splits Current Research / Side Projects / Archive
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
   schema: () =>
@@ -21,7 +21,7 @@ const projects = defineCollection({
     }),
 });
 
-// Notes — the digital garden. evergreen vs dated, freeform tags.
+// Notes: the digital garden. evergreen vs dated, freeform tags.
 const notes = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/notes' }),
   schema: () =>
@@ -36,7 +36,7 @@ const notes = defineCollection({
     }),
 });
 
-// Essays — long-form, polished, rare.
+// Essays: long-form, polished, rare.
 const essays = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/essays' }),
   schema: () =>

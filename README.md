@@ -1,13 +1,13 @@
 # closed loop
 
-Saketh Vegesna's personal site — projects, research notes, essays, and a reading
+Saketh Vegesna's personal site: projects, research notes, essays, and a reading
 log. Built with [Astro](https://astro.build) + MDX, deployed to GitHub Pages.
 
 ## Structure
 
 | Section | Where content lives | Notes |
 | --- | --- | --- |
-| Home | `src/pages/index.astro` | Doorway page — intro + latest note/project/reading |
+| Home | `src/pages/index.astro` | Doorway page: intro + latest note/project/reading |
 | About / Now / Vision | `src/pages/about.astro` | One page, three sections. Edit `Now` regularly. |
 | Projects & Research | `src/content/projects/*.mdx` | `category: current \| side \| archive` in frontmatter |
 | Notes | `src/content/notes/*.mdx` | `evergreen: true/false`, freeform `tags` |
@@ -18,7 +18,7 @@ log. Built with [Astro](https://astro.build) + MDX, deployed to GitHub Pages.
 | Contact | `src/pages/contact.astro` | Edit the `links` array directly |
 
 Every sample file in `src/content/` is marked **SAMPLE ENTRY** in its frontmatter
-and body — replace or delete them. To add a new entry, copy an existing `.mdx`
+and body; replace or delete them. To add a new entry, copy an existing `.mdx`
 file in the relevant folder, change the frontmatter, write the body.
 
 ## Adding images and video
@@ -32,7 +32,7 @@ Drop files into `public/images/...` and reference them with an absolute path:
 ```
 
 Large video files should generally be uploaded to YouTube/Vimeo and embedded,
-rather than committed to the repo — GitHub Pages isn't built for serving large
+rather than committed to the repo; GitHub Pages isn't built for serving large
 binary files.
 
 ## Commands

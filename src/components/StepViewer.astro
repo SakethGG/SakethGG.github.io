@@ -1,0 +1,213 @@
+---
+// Small in-browser STEP file viewer.
+// Loads three.js + occt-import-js (WASM STEP parser) from a CDN at runtime,
+// so no build-time dependency is needed for this one-off use case.
+interface Props {
+  src: string;
+  height?: string;
+}
+
+const { src, height = '480px' } = Astro.props;
+const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div class="step-viewer" id={viewerId} data-src={src} style={`height: ${height};`}>
+  <div class="step-viewer__status">Loading viewer&hellip;</div>
+</div>
+
+<style>
+  .step-viewer {
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1b1d21;
+    margin: 1.5rem 0;
+  }
+  .step-viewer canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .step-viewer__status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cfd2d8;
+    font-size: 0.85rem;
+    font-family: inherit;
+    padding: 1rem;
+    text-align: center;
+  }
+  .step-viewer__hint {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.75rem;
+    color: #9a9ea6;
+    font-size: 0.7rem;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+  const ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+  const OCCT_URL = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/occt-import-js.js';
+  const OCCT_BASE = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/';
+
+  let occtModulePromise: Promise<any> | null = null;
+
+  function ensureImportMap() {
+    if (document.querySelector('script[type="importmap"]')) return;
+    const map = document.createElement('script');
+    map.type = 'importmap';
+    map.textContent = JSON.stringify({ imports: { three: THREE_URL } });
+    document.head.prepend(map);
+  }
+
+  function loadOcctFactory(): Promise<any> {
+    if (occtModulePromise) return occtModulePromise;
+    occtModulePromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = OCCT_URL;
+      script.onload = () => resolve((window as any).occtimportjs);
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+    return occtModulePromise;
+  }
+
+  async function initViewer(container: HTMLElement) {
+    const statusEl = container.querySelector('.step-viewer__status') as HTMLElement;
+    const src = container.dataset.src as string;
+
+    try {
+      ensureImportMap();
+      const THREE = await import(/* @vite-ignore */ THREE_URL);
+      const { OrbitControls } = await import(/* @vite-ignore */ ORBIT_URL);
+      const occtimportjs = await loadOcctFactory();
+
+      statusEl.textContent = 'Parsing STEP geometry…';
+
+      const [occt, fileResponse] = await Promise.all([
+        occtimportjs({ locateFile: (f: string) => OCCT_BASE + f }),
+        fetch(src),
+      ]);
+
+      const buffer = await fileResponse.arrayBuffer();
+      const result = occt.ReadStepFile(new Uint8Array(buffer), null);
+
+      if (!result.success || !result.meshes || result.meshes.length === 0) {
+        statusEl.textContent = 'Could not parse this STEP file in-browser. Use the download link below.';
+        return;
+      }
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1b1d21);
+
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        10000
+      );
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      statusEl.remove();
+      container.appendChild(renderer.domElement);
+
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x33353a, 1.6);
+      scene.add(hemi);
+      const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+      dir.position.set(1, 1.5, 1);
+      scene.add(dir);
+
+      const group = new THREE.Group();
+      const box = new THREE.Box3();
+
+      for (const mesh of result.meshes) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute(
+          'position',
+          new THREE.BufferAttribute(new Float32Array(mesh.attributes.position.array), 3)
+        );
+        if (mesh.attributes.normal) {
+          geometry.setAttribute(
+            'normal',
+            new THREE.BufferAttribute(new Float32Array(mesh.attributes.normal.array), 3)
+          );
+        } else {
+          geometry.computeVertexNormals();
+        }
+        geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(mesh.index.array), 1));
+
+        const color = mesh.color
+          ? new THREE.Color(mesh.color[0], mesh.color[1], mesh.color[2])
+          : new THREE.Color(0x8a95a1);
+        const material = new THREE.MeshStandardMaterial({
+          color,
+          metalness: 0.35,
+          roughness: 0.55,
+          side: THREE.DoubleSide,
+        });
+        const threeMesh = new THREE.Mesh(geometry, material);
+        group.add(threeMesh);
+      }
+
+      scene.add(group);
+      box.setFromObject(group);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+      group.position.sub(center);
+
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      camera.position.set(maxDim * 1.2, maxDim * 1.0, maxDim * 1.4);
+      camera.near = maxDim / 100;
+      camera.far = maxDim * 100;
+      camera.updateProjectionMatrix();
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.target.set(0, 0, 0);
+
+      function onResize() {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      window.addEventListener('resize', onResize);
+
+      function animate() {
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    } catch (err) {
+      console.error('STEP viewer failed to load', err);
+      statusEl.textContent = 'Viewer failed to load (browser or network issue). Use the download link below.';
+    }
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('.step-viewer[data-src]').forEach((el) => {
+      if (el.dataset.initialized) return;
+      el.dataset.initialized = 'true';
+      initViewer(el);
+    });
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    boot();
+  } else {
+    document.addEventListener('DOMContentLoaded', boot);
+  }
+</script>

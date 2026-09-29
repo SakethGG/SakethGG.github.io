@@ -1,4 +1,4 @@
-// Edit this list directly — no need to touch any page code.
+// Edit this list directly; no need to touch any page code.
 // status: 'published' | 'in-review' | 'in-prep'
 
 export interface Publication {
@@ -13,7 +13,7 @@ export interface Publication {
 
 export const publications: Publication[] = [
   {
-    title: 'SAMPLE ENTRY — replace with your real publication',
+    title: 'SAMPLE ENTRY: replace with your real publication',
     authors: 'S. Vegesna, et al.',
     venue: 'Venue / journal / conference name',
     year: '2026',
