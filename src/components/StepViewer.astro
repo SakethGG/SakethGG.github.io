@@ -13,6 +13,20 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
 
 <div class="step-viewer" id={viewerId} data-src={src} style={`height: ${height};`}>
   <div class="step-viewer__status">Loading viewer&hellip;</div>
+  <div class="step-viewer__toolbar" hidden>
+    <label class="step-viewer__toggle">
+      <input type="checkbox" data-role="section-toggle" /> Cross-section
+    </label>
+    <div class="step-viewer__section-controls" data-role="section-controls" hidden>
+      <div class="step-viewer__axes" role="group" aria-label="Cut axis">
+        <button type="button" data-axis="x">X</button>
+        <button type="button" data-axis="y" class="is-active">Y</button>
+        <button type="button" data-axis="z">Z</button>
+      </div>
+      <input type="range" min="0" max="100" value="50" data-role="section-slider" aria-label="Cut position" />
+      <button type="button" data-role="section-flip" title="Flip cut direction">Flip</button>
+    </div>
+  </div>
 </div>
 
 <style>
@@ -21,7 +35,7 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
-    background: #1b1d21;
+    background: #d6e8f7;
     margin: 1.5rem 0;
   }
   .step-viewer canvas {
@@ -35,17 +49,68 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #cfd2d8;
+    color: #3b4a5a;
     font-size: 0.85rem;
     font-family: inherit;
     padding: 1rem;
     text-align: center;
   }
+  .step-viewer__toolbar {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.75);
+    color: #3b4a5a;
+    font-size: 0.75rem;
+    backdrop-filter: blur(4px);
+  }
+  .step-viewer__toolbar[hidden],
+  .step-viewer__section-controls[hidden] {
+    display: none;
+  }
+  .step-viewer__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+  }
+  .step-viewer__section-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .step-viewer__axes {
+    display: flex;
+    gap: 0.2rem;
+  }
+  .step-viewer__toolbar button {
+    font: inherit;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #9db4c8;
+    border-radius: 4px;
+    background: #fff;
+    color: inherit;
+    cursor: pointer;
+  }
+  .step-viewer__toolbar button.is-active {
+    background: #3b6fa0;
+    border-color: #3b6fa0;
+    color: #fff;
+  }
+  .step-viewer__toolbar input[type='range'] {
+    width: 8rem;
+  }
   .step-viewer__hint {
     position: absolute;
     bottom: 0.5rem;
     right: 0.75rem;
-    color: #9a9ea6;
+    color: #6b7c8d;
     font-size: 0.7rem;
     pointer-events: none;
   }
@@ -105,7 +170,7 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
       }
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x1b1d21);
+      scene.background = new THREE.Color(0xd6e8f7);
 
       const camera = new THREE.PerspectiveCamera(
         45,
@@ -120,11 +185,16 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
       statusEl.remove();
       container.appendChild(renderer.domElement);
 
-      const hemi = new THREE.HemisphereLight(0xffffff, 0x33353a, 1.6);
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x8fa3b5, 1.6);
       scene.add(hemi);
       const dir = new THREE.DirectionalLight(0xffffff, 1.2);
       dir.position.set(1, 1.5, 1);
       scene.add(dir);
+
+      // Cross-section: one clipping plane shared by all materials. Back faces
+      // are drawn in a flat colour so the cut reads as a solid section.
+      const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+      const clipList = [clipPlane];
 
       const group = new THREE.Group();
       const box = new THREE.Box3();
@@ -156,6 +226,12 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
         });
         const threeMesh = new THREE.Mesh(geometry, material);
         group.add(threeMesh);
+
+        const sectionMaterial = new THREE.MeshBasicMaterial({
+          color: 0xe07b39,
+          side: THREE.BackSide,
+        });
+        group.add(new THREE.Mesh(geometry, sectionMaterial));
       }
 
       scene.add(group);
@@ -175,6 +251,48 @@ const viewerId = `step-viewer-${Math.random().toString(36).slice(2, 9)}`;
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.target.set(0, 0, 0);
+
+      // --- Cross-section controls ---
+      const toolbar = container.querySelector('.step-viewer__toolbar') as HTMLElement;
+      const toggle = container.querySelector('[data-role="section-toggle"]') as HTMLInputElement;
+      const controlsEl = container.querySelector('[data-role="section-controls"]') as HTMLElement;
+      const slider = container.querySelector('[data-role="section-slider"]') as HTMLInputElement;
+      const flipBtn = container.querySelector('[data-role="section-flip"]') as HTMLButtonElement;
+      const axisBtns = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-axis]'));
+      let axis: 'x' | 'y' | 'z' = 'y';
+      let flipped = false;
+
+      function updateClip() {
+        const half = size[axis] / 2;
+        const offset = -half + (Number(slider.value) / 100) * size[axis];
+        const sign = flipped ? -1 : 1;
+        const normal = new THREE.Vector3(
+          axis === 'x' ? -sign : 0,
+          axis === 'y' ? -sign : 0,
+          axis === 'z' ? -sign : 0
+        );
+        // Keeps points where sign * (p[axis] - offset) <= 0.
+        clipPlane.set(normal, sign * offset);
+      }
+
+      toggle.addEventListener('change', () => {
+        controlsEl.hidden = !toggle.checked;
+        renderer.clippingPlanes = toggle.checked ? clipList : [];
+        if (toggle.checked) updateClip();
+      });
+      slider.addEventListener('input', updateClip);
+      flipBtn.addEventListener('click', () => {
+        flipped = !flipped;
+        updateClip();
+      });
+      axisBtns.forEach((btn) =>
+        btn.addEventListener('click', () => {
+          axis = btn.dataset.axis as 'x' | 'y' | 'z';
+          axisBtns.forEach((b) => b.classList.toggle('is-active', b === btn));
+          updateClip();
+        })
+      );
+      toolbar.hidden = false;
 
       function onResize() {
         const w = container.clientWidth;
