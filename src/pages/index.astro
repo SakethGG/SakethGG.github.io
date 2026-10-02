@@ -1,214 +1,405 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { publications } from '../data/publications';
 
-const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-const latestNote = notes[0];
-const latestProject = projects[0];
+const live = ({ data }: { data: { draft: boolean } }) => !data.draft;
+const [rawProjects, rawNotes, rawEssays] = await Promise.all([
+  getCollection('projects', live),
+  getCollection('notes', live),
+  getCollection('essays', live),
+]);
 
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+type Item = {
+  kind: 'project' | 'note' | 'essay';
+  id: string;
+  href: string;
+  title: string;
+  summary: string;
+  tags: string[];
+  date: Date;
+  cover?: string;
+  status?: string;
+};
+
+const projects: Item[] = [
+  ...rawProjects.map((p): Item => ({
+    kind: 'project', id: p.id, href: `/projects/${p.id}/`, title: p.data.title,
+    summary: p.data.summary, tags: p.data.tags, date: p.data.date, cover: p.data.cover, status: p.data.status,
+  })),
+  ...rawNotes.map((n): Item => ({
+    kind: 'note', id: n.id, href: `/notes/${n.id}/`, title: n.data.title,
+    summary: n.data.summary ?? '', tags: n.data.tags, date: n.data.date,
+  })),
+  ...rawEssays.map((e): Item => ({
+    kind: 'essay', id: e.id, href: `/essays/${e.id}/`, title: e.data.title,
+    summary: e.data.summary, tags: e.data.tags, date: e.data.date,
+  })),
+].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+const prefix = { project: 'SP', note: 'NT', essay: 'ES' } as const;
+const kindLabel = { project: 'project', note: 'note', essay: 'essay' } as const;
+const counters = { project: 0, note: 0, essay: 0 };
+const codes = new Map<string, string>();
+[...projects].reverse().forEach((p) => {
+  counters[p.kind]++;
+  codes.set(`${p.kind}/${p.id}`, `${prefix[p.kind]}-${String(counters[p.kind]).padStart(3, '0')}`);
+});
+
+const pad = (n: number, w = 3) => String(n).padStart(w, '0');
+const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+
+// Tag filters: most common tags first.
+const tagCount = new Map<string, number>();
+projects.forEach((p) => p.tags.forEach((t) => tagCount.set(t, (tagCount.get(t) ?? 0) + 1)));
+const topTags = [...tagCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([t]) => t);
+
+// Deterministic generative art for projects that have no cover photo.
+function art(id: string) {
+  const h = hash(id);
+  const kind = h % 4;
+  const n = 6 + (h % 9);
+  const out: string[] = [];
+  if (kind === 0) {
+    for (let i = 1; i <= n; i++) out.push(`<circle cx="100" cy="75" r="${i * 7}" />`);
+  } else if (kind === 1) {
+    for (let i = 0; i < n * 3; i++) {
+      const a = (i / (n * 3)) * Math.PI * 2;
+      out.push(`<line x1="${100 + Math.cos(a) * 20}" y1="${75 + Math.sin(a) * 20}" x2="${100 + Math.cos(a) * 68}" y2="${75 + Math.sin(a) * 68}" />`);
+    }
+    out.push(`<circle cx="100" cy="75" r="68" /><circle cx="100" cy="75" r="20" />`);
+  } else if (kind === 2) {
+    for (let i = 0; i < n + 4; i++) {
+      const y = 15 + i * 9;
+      const amp = 4 + (h % 7);
+      let d = `M0 ${y}`;
+      for (let x = 0; x <= 200; x += 10) d += ` L${x} ${y + Math.sin(x / 18 + i * 0.6) * amp}`;
+      out.push(`<path d="${d}" fill="none" />`);
+    }
+  } else {
+    for (let r = 0; r < 7; r++)
+      for (let c = 0; c < 10; c++) {
+        const s = ((h >> ((r * 10 + c) % 24)) & 3) * 1.6 + 1;
+        out.push(`<rect x="${12 + c * 18}" y="${12 + r * 18}" width="${s * 2}" height="${s * 2}" />`);
+      }
+  }
+  return out.join('');
+}
+
+const statusLabel = (s: string) => (s === 'shipped' ? 'done' : s);
+const year = (d: Date) => d.getFullYear();
+const marquee = projects.map((p) => p.title.replace(/[“”"]/g, ''));
 ---
 
-<BaseLayout title="closed loop" wide={false}>
-  <section class="intro">
-    <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="280" height="280" />
-    <div class="intro-text">
-      <h1>Saketh Vegesna</h1>
-      <p class="lede">
-        I work on <span class="accent">legged robots</span>: the control and planning
-        problems that let a machine with legs stay upright, adapt, and move like it means it.
-        This is a small, honest corner of the internet where I keep the notes,
-        half-built ideas, and longer essays I'd otherwise lose to a notebook. Wander in.
-      </p>
+<BaseLayout title="closed loop" full>
+  <div class="bench-bg" aria-hidden="true"></div>
+
+  <section class="hero" aria-label="Collection">
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        {[0, 1].map(() => marquee.map((t) => <span>{t}</span>))}
+      </div>
     </div>
+    <h1 class="title">
+      <span>a drawer of</span>
+      <span class="big">things<br />that move<span class="blink">_</span></span>
+    </h1>
+    <p class="sub mono">{pad(projects.length)} specimens: projects, notes &amp; essays · hover to inspect · click to open</p>
   </section>
 
-  <section class="doorway">
-    <h2 class="doorway-title mono">Recently</h2>
-    <div class="doorway-grid">
-      {latestNote && (
-        <a class="plain door" href={`/notes/${latestNote.id}/`}>
-          <p class="pill">Latest note</p>
-          <h3>{latestNote.data.title}</h3>
-          <p class="muted mono small">{fmt(latestNote.data.date)}</p>
-        </a>
-      )}
-      {latestProject && (
-        <a class="plain door" href={`/projects/${latestProject.id}/`}>
-          <p class="pill">Latest project</p>
-          <h3>{latestProject.data.title}</h3>
-          <p class="muted mono small">{fmt(latestProject.data.date)}</p>
-        </a>
-      )}
-    </div>
-  </section>
+  <div class="filters" role="toolbar" aria-label="Filter by tag">
+    <button class="chip on" data-tag="*">all</button>
+    <button class="chip" data-tag="projects">projects</button>
+    <button class="chip" data-tag="notes">notes</button>
+    <button class="chip" data-tag="essays">essays</button>
+    <span class="sep" aria-hidden="true">/</span>
+    {topTags.map((t) => <button class="chip" data-tag={t}>#{t}</button>)}
+  </div>
 
-  <section class="pubs">
-    <h2 class="doorway-title mono">Publications</h2>
-    <ul class="pub-list">
-      {publications.map((p) => (
-        <li class="pub">
-          {p.image && <img class="pub-thumb" src={p.image} alt="" loading="lazy" />}
-          <div class="pub-text">
-            {p.link ? (
-              <a class="plain" href={p.link}>{p.title}</a>
-            ) : (
-              <span>{p.title}</span>
-            )}
-            <p class="muted small">{p.authors}, {p.venue}, {p.year}</p>
-            <p class="pub-status mono small">{p.status.replace('-', ' ')}</p>
-          </div>
+  <ul class="grid" id="grid">
+    {projects.map((p, i) => {
+      return (
+        <li class:list={['cell', { feature: i === 0 || i === 3 }]} data-tags={[p.kind + 's', ...p.tags].join(' ')}>
+          <a class="plain tile" href={p.href} style={`--rot:${((hash(p.id) % 7) - 3) * 0.25}deg`}>
+            <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+            <div class="media">
+              {p.cover ? (
+                <img src={p.cover} alt="" loading="lazy" />
+              ) : (
+                <svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice" set:html={art(p.kind + p.id)} />
+              )}
+              <div class="spec">
+                <p>{p.summary}</p>
+              </div>
+            </div>
+            <div class="label mono">
+              <span class="code">{codes.get(`${p.kind}/${p.id}`)}</span>
+              {p.status ? (
+                <>
+                  <span class={`led led-${p.status}`} title={statusLabel(p.status)}></span>
+                  <span class="st">{statusLabel(p.status)}</span>
+                </>
+              ) : (
+                <span class="st kind">{kindLabel[p.kind]}</span>
+              )}
+              <span class="yr">{year(p.date)}</span>
+            </div>
+            <h2>{p.title}</h2>
+          </a>
         </li>
-      ))}
-    </ul>
-  </section>
+      );
+    })}
+  </ul>
 
-  <nav class="jump" aria-label="Sections">
-    <a class="plain" href="/projects/">Projects &amp; Research</a>
-    <a class="plain" href="/notes/">Notes</a>
-    <a class="plain" href="/essays/">Essays</a>
-    <a class="plain" href="/about/">About &amp; Now</a>
-  </nav>
+  <div class="coords mono" id="coords" aria-hidden="true">x 000 · y 000</div>
 </BaseLayout>
 
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip');
+  const cells = document.querySelectorAll<HTMLElement>('.cell');
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.toggle('on', c === chip));
+      const tag = chip.dataset.tag!;
+      cells.forEach((cell) => {
+        const hit = tag === '*' || (cell.dataset.tags ?? '').split(' ').includes(tag);
+        cell.classList.toggle('dim', !hit);
+      });
+    })
+  );
+  const coords = document.getElementById('coords')!;
+  window.addEventListener('pointermove', (e) => {
+    coords.textContent = `x ${String(e.clientX).padStart(4, '0')} · y ${String(e.clientY).padStart(4, '0')}`;
+  });
+</script>
+
 <style>
-  .intro {
-    display: flex;
-    align-items: center;
+  .bench-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 80%);
+  }
+
+  .hero {
+    padding: 1rem 0 2.5rem;
+  }
+  .ticker {
+    overflow: hidden;
+    border-block: 1px solid var(--border);
+    padding: 0.45rem 0;
+    margin-bottom: 3rem;
+    white-space: nowrap;
+  }
+  .ticker-track {
+    display: inline-flex;
     gap: 2.5rem;
-    margin-bottom: 3.5rem;
-  }
-  .avatar {
-    flex-shrink: 0;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--border);
-  }
-  .intro-text h1 {
-    font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.4rem);
-    margin: 0 0 0.75rem;
-  }
-  @media (max-width: 640px) {
-    .intro {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1.5rem;
-    }
-    .avatar {
-      width: 180px;
-      height: 180px;
-    }
-  }
-  .lede {
-    font-size: 1.15rem;
-    color: var(--muted);
-    max-width: 38rem;
-  }
-  .doorway-title {
-    font-size: 0.8rem;
+    animation: scroll 60s linear infinite;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--muted);
-    margin-bottom: 1rem;
   }
-  .doorway-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    gap: 1rem;
-    margin-bottom: 3rem;
-  }
-  .door {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.2rem;
-    transition: border-color 0.15s ease;
-  }
-  .door:hover {
-    border-color: var(--accent);
-  }
-  .door h3 {
-    font-size: 1.05rem;
-    margin: 0.4rem 0 0.4rem;
-  }
-  .door:hover h3 {
+  .ticker-track span::after {
+    content: '✦';
     color: var(--accent);
+    margin-left: 2.5rem;
   }
-  .small {
+  @keyframes scroll {
+    to { transform: translateX(-50%); }
+  }
+  .title {
+    margin: 0;
+    font-weight: 400;
+    line-height: 0.95;
+  }
+  .title span {
+    display: block;
+  }
+  .title span:first-child {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+  }
+  .big {
+    font-size: clamp(3.2rem, 1rem + 9vw, 9rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .blink {
+    display: inline !important;
+    color: var(--accent);
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  .sub {
+    margin: 1.5rem 0 0;
     font-size: 0.78rem;
+    color: var(--muted);
   }
-  .pubs {
-    margin-bottom: 3rem;
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 2rem;
   }
-  .pub-list {
+  .chip {
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2em 0.8em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sep { color: var(--border); align-self: center; }
+  .kind { color: var(--accent); }
+  .chip:hover { color: var(--accent); border-color: var(--accent); }
+  .chip.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+  .grid {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    grid-auto-flow: dense;
+    gap: 2rem 1.75rem;
   }
-  .pub {
-    display: flex;
-    gap: 1.2rem;
-    align-items: flex-start;
-    padding-bottom: 1.1rem;
-    border-bottom: 1px solid var(--border);
+  .cell {
+    margin: 0;
+    transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
   }
-  .pub:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+  .cell.feature { grid-column: span 2; }
+  @media (max-width: 40rem) { .cell.feature { grid-column: auto; } }
+  .cell.dim {
+    opacity: 0.12;
+    filter: grayscale(1);
+    transform: scale(0.97);
+    pointer-events: none;
   }
-  .pub-thumb {
-    flex-shrink: 0;
-    width: 8rem;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: var(--radius);
+
+  .tile {
+    position: relative;
+    display: block;
+    padding: 0.7rem;
+    background: var(--bg);
     border: 1px solid var(--border);
+    transform: rotate(var(--rot));
+    transition: transform 0.25s cubic-bezier(.2,.8,.2,1), box-shadow 0.25s ease, border-color 0.2s;
   }
-  .pub-text {
-    min-width: 0;
+  .tile:hover {
+    transform: rotate(0) translateY(-6px);
+    border-color: var(--accent);
+    box-shadow: 8px 8px 0 var(--accent);
   }
-  .pub a {
-    font-weight: 600;
+  .reg {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border: 0 solid var(--accent);
   }
-  .pub-status {
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--accent);
-    margin-top: 0.25rem;
+  .tl { top: -5px; left: -5px; border-width: 1px 0 0 1px; }
+  .tr { top: -5px; right: -5px; border-width: 1px 1px 0 0; }
+  .bl { bottom: -5px; left: -5px; border-width: 0 0 1px 1px; }
+  .br { bottom: -5px; right: -5px; border-width: 0 1px 1px 0; }
+
+  .media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--bg-raised);
   }
-  @media (max-width: 480px) {
-    .pub {
-      flex-direction: column;
-    }
-    .pub-thumb {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-    }
+  .feature .media { aspect-ratio: 16 / 9; }
+  .media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.05);
+    transition: filter 0.4s ease, transform 0.5s ease;
   }
-  .jump {
+  .tile:hover .media img { filter: none; transform: scale(1.05); }
+  .media svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--fg);
+    fill: none;
+    stroke-width: 0.8;
+    opacity: 0.7;
+    transition: stroke 0.3s, transform 0.6s ease;
+  }
+  .tile:hover .media svg { stroke: var(--accent); transform: rotate(4deg) scale(1.08); }
+
+  .spec {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 0.8rem 0.9rem;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    border-top: 1px solid var(--accent);
+    transform: translateY(101%);
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+  }
+  .spec p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--fg);
+  }
+  .tile:hover .spec, .tile:focus-visible .spec { transform: none; }
+
+  .label {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.4rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.7rem 0 0.2rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
   }
-  .jump a {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
+  .code { color: var(--accent); }
+  .yr { margin-left: auto; }
+  .led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
   }
-  .jump a:hover {
-    color: var(--accent);
+  .led-active { background: #2fbf71; box-shadow: 0 0 6px #2fbf71; animation: pulse 2s ease-in-out infinite; }
+  .led-shipped { background: var(--fg); }
+  @keyframes pulse { 50% { opacity: 0.35; } }
+  .tile h2 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+
+  .coords {
+    position: fixed;
+    right: 1rem;
+    bottom: 0.8rem;
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--border);
+    pointer-events: none;
+  }
+  @media (hover: none) { .coords { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track, .blink, .led-active { animation: none; }
   }
 </style>

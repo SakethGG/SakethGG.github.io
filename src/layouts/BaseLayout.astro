@@ -9,13 +9,15 @@ interface Props {
   description?: string;
   image?: string;
   wide?: boolean;
+  full?: boolean;
 }
 
 const {
   title,
-  description = 'Saketh Vegesna: notes, projects, and essays on legged robotics and control.',
+  description = 'A collection of things built: robots, actuators, machines, and software.',
   image,
   wide = true,
+  full = false,
 } = Astro.props;
 
 const pageTitle = title === 'closed loop' ? title : `${title} · closed loop`;
@@ -56,14 +58,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     </script>
   </head>
   <body>
-    <Nav />
-    <main class={wide ? 'wrap-wide' : 'wrap'}>
+    <Nav full={full} />
+    <main class={full ? 'wrap-full' : wide ? 'wrap-wide' : 'wrap'}>
       <slot />
     </main>
     <Footer />
     <style>
       main {
-        padding: 3rem 0 4rem;
+        padding-block: 3rem 4rem;
         min-height: 60vh;
       }
     </style>
