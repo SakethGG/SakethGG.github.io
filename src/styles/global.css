@@ -53,6 +53,9 @@ html {
 
 body {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0;
   background: var(--bg);
   color: var(--fg);
@@ -373,4 +376,9 @@ figcaption {
   .smoke {
     animation: drift 16s ease-in-out infinite;
   }
+}
+
+body > main {
+  flex: 1;
+  width: 100%;
 }
