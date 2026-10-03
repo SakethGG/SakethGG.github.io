@@ -1,5 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Friends' sites, borrowed from Ben Katz's list at robot-daycare.com/about
+const friends = [
+  { name: 'Aaron Sliski', url: 'https://www.aaronsliski.com/index.html' },
+  { name: 'Alex Hattori', url: 'https://www.alex-hattori.com/blog' },
+  { name: 'Amy Qian', url: 'https://amymakesstuff.com/' },
+  { name: 'Andrew Birkel', url: 'https://andrewbirkel.com/project_list.html' },
+  { name: 'Austin Brown', url: 'https://brushless.zone/' },
+  { name: 'Ava Chen', url: 'https://www.avamakesthings.com/' },
+  { name: 'Bayley Wang', url: 'https://isopack.blogspot.com/' },
+  { name: 'Charles Guan', url: 'https://www.etotheipiplusone.net' },
+  { name: 'Dane Kouttron', url: 'https://transistor-man.com/' },
+  { name: 'Jared Di Carlo', url: 'https://jareddicarlo.com/' },
+  { name: 'Nancy Ouyang', url: 'https://orangenarwhals.com/' },
+  { name: 'Shane Colton', url: 'https://scolton.blogspot.com/' },
+];
 ---
 
 <BaseLayout
@@ -11,6 +27,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <a class="plain" href="#about">About</a>
     <a class="plain" href="#now">Now</a>
     <a class="plain" href="#vision">Vision</a>
+    <a class="plain" href="#friends">Friends</a>
   </nav>
 
   <section id="about">
@@ -66,6 +83,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </p>
   </section>
 
+  <section id="friends">
+    <p class="pill">Friends</p>
+    <h2>Other people's sites worth reading</h2>
+    <p>
+      Sites by makers and roboticists, taken from the list on{' '}
+      <a href="https://robot-daycare.com/about/">Robot Daycare</a>.
+    </p>
+    <ul class="friends">
+      {friends.map((f) => (
+        <li><a href={f.url}>{f.name}</a></li>
+      ))}
+    </ul>
+  </section>
+
   <blockquote class="quote">
     <p>
       "A human being should be able to change a diaper, plan an invasion, butcher a hog,
@@ -102,6 +133,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
   .small {
     font-size: 0.78rem;
+  }
+  .friends {
+    list-style: none;
+    padding: 0;
+    columns: 2;
+    column-gap: 2rem;
+  }
+  @media (max-width: 480px) {
+    .friends {
+      columns: 1;
+    }
   }
   .quote {
     margin: 3rem 0 0;

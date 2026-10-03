@@ -4,32 +4,24 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="wrap-wide bar">
-    <p class="muted mono small">&copy; {year} Saketh Vegesna.</p>
-    <p class="muted mono small"><a class="plain" href="/contact/">say hello</a></p>
+    <p class="muted">&copy; {year} Saketh Vegesna</p>
+    <p class="muted"><a href="/contact/">Contact</a></p>
   </div>
 </footer>
 
 <style>
   .site-footer {
     border-top: 1px solid var(--border);
-    margin-top: 5rem;
+    margin-top: 4rem;
   }
   .bar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    flex-wrap: wrap;
+    padding-top: 1.25rem;
+    padding-bottom: 1.5rem;
+    font-size: 0.9rem;
   }
-  .small {
-    font-size: 0.78rem;
-  }
-  a {
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
-  }
-  a:hover {
-    color: var(--accent);
+  p {
+    margin: 0;
   }
 </style>

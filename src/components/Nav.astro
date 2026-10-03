@@ -2,84 +2,103 @@
 import ThemeToggle from './ThemeToggle.astro';
 
 const links = [
-  { href: '/', label: 'Home' },
   { href: '/projects/', label: 'Projects' },
   { href: '/notes/', label: 'Notes' },
   { href: '/essays/', label: 'Essays' },
   { href: '/about/', label: 'About' },
-  { href: '/contact/', label: 'Contact' },
 ];
 
 const path = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === '/' ? path === '/' : path.startsWith(href);
+const isActive = (href: string) => path.startsWith(href);
 ---
 
 <header class="site-header">
   <div class="wrap-wide bar">
-    <a href="/" class="plain wordmark">closed loop<span class="dot">.</span></a>
+    <a href="/" class="plain wordmark">closed loop</a>
     <nav aria-label="Primary">
       <ul>
         {links.map((l) => (
           <li>
-            <a class:list={['plain nav-link', { active: isActive(l.href) }]} href={l.href}>
-              {l.label}
-            </a>
+            <a class:list={['nav-link', { active: isActive(l.href) }]} href={l.href}>{l.label}</a>
           </li>
         ))}
       </ul>
     </nav>
     <ThemeToggle />
   </div>
+  <div class="stage">
+    <div class="wrap-wide">
+    <svg class="doodle" viewBox="0 8 250 92" preserveAspectRatio="xMaxYMax meet" role="img" aria-label="A legged robot lying on its back with its legs in the air, saying: worked in sim." fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="44" y="72" width="104" height="26" rx="6" />
+    <rect x="140" y="80" width="34" height="18" rx="4" />
+    <path d="M163 86 l4 4 M167 86 l-4 4" stroke-width="1.3" />
+    <path d="M62 72 L50 52 L60 36" />
+    <path d="M86 72 L94 50 L84 32" />
+    <path d="M112 72 L104 52 L116 38" />
+    <path d="M134 72 L148 56 L142 42 L154 34" />
+    <path d="M58 30 l-4 -5 M62 30 l0 -6 M66 30 l4 -5" stroke-width="1" />
+    <path d="M186 20 h56 a4 4 0 0 1 4 4 v22 a4 4 0 0 1 -4 4 h-40 l-10 9 l2 -9 h-8 a4 4 0 0 1 -4 -4 v-22 a4 4 0 0 1 4 -4 z" stroke-width="1.3" />
+    <text x="214" y="34" text-anchor="middle" font-size="11" font-family="ui-monospace, Menlo, monospace" fill="currentColor" stroke="none">worked</text>
+    <text x="214" y="46" text-anchor="middle" font-size="11" font-family="ui-monospace, Menlo, monospace" fill="currentColor" stroke="none">in sim.</text>
+  </svg>
+    </div>
+  </div>
 </header>
 
 <style>
-  .site-header {
-    border-bottom: 1px solid var(--border);
-  }
   .bar {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    padding-top: 1.1rem;
-    padding-bottom: 1.1rem;
-    flex-wrap: wrap;
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+    padding-bottom: 0.25rem;
   }
   .wordmark {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.1rem;
-    white-space: nowrap;
-  }
-  .dot {
-    color: var(--accent);
-  }
-  nav {
     flex: 1;
-    min-width: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    white-space: nowrap;
   }
   nav ul {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem 1.1rem;
+    gap: 1.1rem;
     list-style: none;
     margin: 0;
     padding: 0;
   }
+  nav li {
+    margin: 0;
+  }
   .nav-link {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-    text-decoration: none;
-    white-space: nowrap;
+    color: var(--fg);
   }
   .nav-link:hover {
     color: var(--accent);
   }
   .nav-link.active {
+    font-weight: 600;
+    color: var(--accent);
+  }
+  /* The header's bottom border is the floor the robot has fallen on. */
+  .stage {
+    border-bottom: 1.5px solid var(--fg);
+  }
+  .doodle {
+    display: block;
+    margin-left: auto;
+    height: 6.5rem;
+    width: auto;
+    max-width: 100%;
     color: var(--fg);
-    border-bottom: 2px solid var(--accent);
+    overflow: visible;
+  }
+  @media (max-width: 40rem) {
+    .bar {
+      flex-wrap: wrap;
+    }
+    nav {
+      order: 3;
+      flex-basis: 100%;
+    }
   }
 </style>
