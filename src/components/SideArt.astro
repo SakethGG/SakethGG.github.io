@@ -1,0 +1,172 @@
+---
+// Decorative animation for the empty margins on wide screens.
+// Left: a pair of two-joint legs walking. Right: a double pendulum tracing its path.
+---
+
+<aside class="side side-left" aria-hidden="true">
+  <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <line id="ground" x1="0" y1="150" x2="200" y2="150" stroke-dasharray="12 9" stroke-width="1.2" />
+    <g id="leg-far" opacity="0.45">
+      <polyline id="far-path" points="" />
+      <circle id="far-knee" r="3" />
+    </g>
+    <rect x="52" y="54" width="96" height="22" rx="8" fill="var(--bg)" />
+    <g id="leg-near">
+      <polyline id="near-path" points="" />
+      <circle id="near-knee" r="3" />
+    </g>
+    <circle cx="70" cy="65" r="3" fill="currentColor" />
+    <circle cx="130" cy="65" r="3" fill="currentColor" />
+  </svg>
+</aside>
+
+<aside class="side side-right" aria-hidden="true">
+  <svg viewBox="-40 10 280 280" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+    <polyline id="trail" points="" stroke-width="1" opacity="0.55" />
+    <line id="rod1" x1="100" y1="150" x2="100" y2="220" />
+    <line id="rod2" x1="100" y1="220" x2="100" y2="290" />
+    <circle cx="100" cy="150" r="3" fill="currentColor" />
+    <circle id="bob1" cx="100" cy="220" r="6" />
+    <circle id="bob2" cx="100" cy="290" r="6" />
+  </svg>
+</aside>
+
+<script>
+  // Two-joint legs walking: foot follows a stance line + swing arc, knees come from inverse kinematics.
+  const el = (id: string) => document.getElementById(id) as unknown as SVGElement | null;
+  const ground = el('ground');
+  const legs = [
+    { path: el('near-path'), knee: el('near-knee'), hipX: 70, phase: 0 },
+    { path: el('far-path'), knee: el('far-knee'), hipX: 130, phase: 0.5 },
+  ];
+  if (ground && legs.every((l) => l.path && l.knee)) {
+    const HIP_Y = 65, GROUND_Y = 150, L = 46, STRIDE = 26, LIFT = 20, PERIOD = 1.7, STANCE = 0.6;
+
+    const foot = (p: number) => {
+      if (p < STANCE) return { x: STRIDE - (2 * STRIDE * p) / STANCE, y: 0 };
+      const q = (p - STANCE) / (1 - STANCE);
+      return { x: -STRIDE + 2 * STRIDE * q, y: -LIFT * Math.sin(Math.PI * q) };
+    };
+
+    const pose = (t: number) => {
+      for (const leg of legs) {
+        const p = (t / PERIOD + leg.phase) % 1;
+        const f = foot(p);
+        const fx = leg.hipX + f.x, fy = GROUND_Y + f.y;
+        const dx = fx - leg.hipX, dy = fy - HIP_Y;
+        const d = Math.min(Math.hypot(dx, dy), 2 * L - 0.01);
+        const h = Math.sqrt(Math.max(L * L - (d / 2) * (d / 2), 0));
+        const ux = dx / d, uy = dy / d;
+        // knee bends forward (towards +x)
+        const kx = leg.hipX + ux * (d / 2) + uy * h;
+        const ky = HIP_Y + uy * (d / 2) - ux * h;
+        leg.path!.setAttribute('points', `${leg.hipX},${HIP_Y} ${kx.toFixed(1)},${ky.toFixed(1)} ${fx.toFixed(1)},${fy.toFixed(1)}`);
+        leg.knee!.setAttribute('cx', kx.toFixed(1));
+        leg.knee!.setAttribute('cy', ky.toFixed(1));
+      }
+      // stance foot moves at 2*STRIDE per STANCE*PERIOD; the ground scrolls at that speed
+      ground.setAttribute('stroke-dashoffset', String(((2 * STRIDE) / (STANCE * PERIOD)) * t));
+    };
+
+    pose(0.2);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const t0 = performance.now();
+      const frame = (now: number) => {
+        pose((now - t0) / 1000);
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    }
+  }
+</script>
+
+<script>
+  // Double pendulum, integrated with RK4. Static pose if motion is reduced.
+  const $ = (id: string) => document.getElementById(id) as unknown as SVGElement | null;
+  const trail = $('trail'), rod1 = $('rod1'), rod2 = $('rod2'), bob1 = $('bob1'), bob2 = $('bob2');
+  if (trail && rod1 && rod2 && bob1 && bob2) {
+    const L1 = 70, L2 = 70, m1 = 1, m2 = 1, g = 900;
+    const PX = 100, PY = 150;
+    let s = [Math.PI * 0.6, Math.PI * 0.9, 0, 0]; // θ1, θ2, ω1, ω2
+
+    const deriv = ([t1, t2, w1, w2]: number[]) => {
+      const d = t1 - t2;
+      const den = 2 * m1 + m2 - m2 * Math.cos(2 * d);
+      const a1 =
+        (-g * (2 * m1 + m2) * Math.sin(t1) - m2 * g * Math.sin(t1 - 2 * t2) -
+          2 * Math.sin(d) * m2 * (w2 * w2 * L2 + w1 * w1 * L1 * Math.cos(d))) / (L1 * den);
+      const a2 =
+        (2 * Math.sin(d) *
+          (w1 * w1 * L1 * (m1 + m2) + g * (m1 + m2) * Math.cos(t1) + w2 * w2 * L2 * m2 * Math.cos(d))) /
+        (L2 * den);
+      return [w1, w2, a1, a2];
+    };
+    const add = (a: number[], b: number[], k: number) => a.map((v, i) => v + b[i] * k);
+    const step = (dt: number) => {
+      const k1 = deriv(s);
+      const k2 = deriv(add(s, k1, dt / 2));
+      const k3 = deriv(add(s, k2, dt / 2));
+      const k4 = deriv(add(s, k3, dt));
+      s = s.map((v, i) => v + (dt / 6) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+    };
+
+    const pts: string[] = [];
+    const draw = () => {
+      const x1 = PX + L1 * Math.sin(s[0]), y1 = PY + L1 * Math.cos(s[0]);
+      const x2 = x1 + L2 * Math.sin(s[1]), y2 = y1 + L2 * Math.cos(s[1]);
+      rod1.setAttribute('x2', String(x1)); rod1.setAttribute('y2', String(y1));
+      rod2.setAttribute('x1', String(x1)); rod2.setAttribute('y1', String(y1));
+      rod2.setAttribute('x2', String(x2)); rod2.setAttribute('y2', String(y2));
+      bob1.setAttribute('cx', String(x1)); bob1.setAttribute('cy', String(y1));
+      bob2.setAttribute('cx', String(x2)); bob2.setAttribute('cy', String(y2));
+      pts.push(`${x2.toFixed(1)},${y2.toFixed(1)}`);
+      if (pts.length > 220) pts.shift();
+      trail.setAttribute('points', pts.join(' '));
+    };
+
+    draw();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let last = performance.now();
+      const frame = (now: number) => {
+        const dt = Math.min((now - last) / 1000, 0.05);
+        last = now;
+        for (let i = 0; i < 4; i++) step(dt / 4);
+        draw();
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    }
+  }
+</script>
+
+<style>
+  .side {
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: calc((100vw - var(--max-width)) / 2 - 2rem);
+    max-width: 16rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .side-left {
+    left: 1rem;
+  }
+  .side-right {
+    right: 1rem;
+  }
+  .side svg {
+    width: 100%;
+    height: auto;
+  }
+  @media (min-width: 1200px) {
+    .side {
+      display: flex;
+    }
+  }
+</style>
