@@ -16,9 +16,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
 <ul class="list">
   {items.map((i) => (
     <li>
-      <a class="title" href={i.href}>{i.title}</a>
-      <span class="leader" aria-hidden="true"></span>
       <span class="date muted">{fmt(i.date)}</span>
+      <a href={i.href}>{i.title}</a>
     </li>
   ))}
 </ul>
@@ -31,37 +30,19 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
   }
   .list li {
     display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
+    gap: 1.25rem;
     margin: 0;
-    padding: 0.5rem 0;
-  }
-  .title {
-    color: var(--fg);
-    font-weight: 500;
-  }
-  .title:hover {
-    color: var(--accent);
-    text-decoration: none;
-  }
-  .leader {
-    flex: 1;
-    min-width: 1rem;
-    border-bottom: 1px dotted var(--muted);
-    transform: translateY(-0.25em);
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border);
   }
   .date {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    white-space: nowrap;
+    flex: 0 0 6.5rem;
+    font-size: 0.95rem;
   }
   @media (max-width: 480px) {
-    .leader {
-      display: none;
-    }
     .list li {
-      flex-direction: column-reverse;
-      gap: 0;
+      flex-direction: column;
+      gap: 0.1rem;
     }
   }
 </style>
