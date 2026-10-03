@@ -1,214 +1,78 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { publications } from '../data/publications';
 
-const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-const latestNote = notes[0];
-const latestProject = projects[0];
+const count = async (name: 'projects' | 'notes' | 'essays') =>
+  (await getCollection(name, ({ data }) => !data.draft)).length;
 
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+const sections = [
+  { href: '/projects/', label: 'Projects', blurb: "Things I've built.", n: await count('projects') },
+  { href: '/notes/', label: 'Notes', blurb: 'Short, informal write-ups.', n: await count('notes') },
+  { href: '/essays/', label: 'Essays', blurb: 'Longer pieces.', n: await count('essays') },
+];
 ---
 
 <BaseLayout title="closed loop" wide={false}>
-  <section class="intro">
-    <img class="avatar" src="/images/saketh.png" alt="Saketh Vegesna" width="280" height="280" />
-    <div class="intro-text">
-      <h1>Saketh Vegesna</h1>
-      <p class="lede">
-        I work on <span class="accent">legged robots</span>: the control and planning
-        problems that let a machine with legs stay upright, adapt, and move like it means it.
-        This is a small, honest corner of the internet where I keep the notes,
-        half-built ideas, and longer essays I'd otherwise lose to a notebook. Wander in.
-      </p>
-    </div>
-  </section>
+  <h1>Saketh Vegesna</h1>
+  <p class="lede muted">I work on legged robots: control, planning, and the hardware that carries it out.</p>
 
-  <section class="doorway">
-    <h2 class="doorway-title mono">Recently</h2>
-    <div class="doorway-grid">
-      {latestNote && (
-        <a class="plain door" href={`/notes/${latestNote.id}/`}>
-          <p class="pill">Latest note</p>
-          <h3>{latestNote.data.title}</h3>
-          <p class="muted mono small">{fmt(latestNote.data.date)}</p>
+  <ul class="sections">
+    {sections.map((s) => (
+      <li>
+        <a class="plain section" href={s.href}>
+          <span class="label">{s.label}</span>
+          <span class="blurb muted">{s.blurb}</span>
+          <span class="n mono muted">{s.n}</span>
         </a>
-      )}
-      {latestProject && (
-        <a class="plain door" href={`/projects/${latestProject.id}/`}>
-          <p class="pill">Latest project</p>
-          <h3>{latestProject.data.title}</h3>
-          <p class="muted mono small">{fmt(latestProject.data.date)}</p>
-        </a>
-      )}
-    </div>
-  </section>
-
-  <section class="pubs">
-    <h2 class="doorway-title mono">Publications</h2>
-    <ul class="pub-list">
-      {publications.map((p) => (
-        <li class="pub">
-          {p.image && <img class="pub-thumb" src={p.image} alt="" loading="lazy" />}
-          <div class="pub-text">
-            {p.link ? (
-              <a class="plain" href={p.link}>{p.title}</a>
-            ) : (
-              <span>{p.title}</span>
-            )}
-            <p class="muted small">{p.authors}, {p.venue}, {p.year}</p>
-            <p class="pub-status mono small">{p.status.replace('-', ' ')}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </section>
-
-  <nav class="jump" aria-label="Sections">
-    <a class="plain" href="/projects/">Projects &amp; Research</a>
-    <a class="plain" href="/notes/">Notes</a>
-    <a class="plain" href="/essays/">Essays</a>
-    <a class="plain" href="/about/">About &amp; Now</a>
-  </nav>
+      </li>
+    ))}
+  </ul>
 </BaseLayout>
 
 <style>
-  .intro {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    margin-bottom: 3.5rem;
-  }
-  .avatar {
-    flex-shrink: 0;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--border);
-  }
-  .intro-text h1 {
-    font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.4rem);
-    margin: 0 0 0.75rem;
-  }
-  @media (max-width: 640px) {
-    .intro {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1.5rem;
-    }
-    .avatar {
-      width: 180px;
-      height: 180px;
-    }
-  }
   .lede {
     font-size: 1.15rem;
-    color: var(--muted);
-    max-width: 38rem;
-  }
-  .doorway-title {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    margin-bottom: 1rem;
-  }
-  .doorway-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    gap: 1rem;
     margin-bottom: 3rem;
   }
-  .door {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.2rem;
-    transition: border-color 0.15s ease;
-  }
-  .door:hover {
-    border-color: var(--accent);
-  }
-  .door h3 {
-    font-size: 1.05rem;
-    margin: 0.4rem 0 0.4rem;
-  }
-  .door:hover h3 {
-    color: var(--accent);
-  }
-  .small {
-    font-size: 0.78rem;
-  }
-  .pubs {
-    margin-bottom: 3rem;
-  }
-  .pub-list {
+  .sections {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
   }
-  .pub {
-    display: flex;
-    gap: 1.2rem;
-    align-items: flex-start;
-    padding-bottom: 1.1rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .pub:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-  .pub-thumb {
-    flex-shrink: 0;
-    width: 8rem;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-  }
-  .pub-text {
-    min-width: 0;
-  }
-  .pub a {
-    font-weight: 600;
-  }
-  .pub-status {
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--accent);
-    margin-top: 0.25rem;
-  }
-  @media (max-width: 480px) {
-    .pub {
-      flex-direction: column;
-    }
-    .pub-thumb {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-    }
-  }
-  .jump {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.4rem;
-    padding-top: 1.5rem;
+  .sections li {
+    margin: 0;
     border-top: 1px solid var(--border);
   }
-  .jump a {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
+  .sections li:last-child {
+    border-bottom: 1px solid var(--border);
   }
-  .jump a:hover {
+  .section {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 1.4rem 0;
+    text-decoration: none;
+  }
+  .label {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    min-width: 8rem;
+  }
+  .blurb {
+    flex: 1;
+  }
+  .section:hover .label {
     color: var(--accent);
+  }
+  @media (max-width: 480px) {
+    .section {
+      flex-wrap: wrap;
+      gap: 0.3rem 1rem;
+    }
+    .blurb {
+      flex-basis: 100%;
+      order: 3;
+    }
   }
 </style>

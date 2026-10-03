@@ -35,7 +35,7 @@ const fmt = (d: Date) =>
       {tags.length > 0 && (
         <div class="tag-row">
           {tags.map((t) => (
-            <a class="tag" href={`/notes/tags/${t}/`}>#{t}</a>
+            <span class="tag">#{t}</span>
           ))}
         </div>
       )}

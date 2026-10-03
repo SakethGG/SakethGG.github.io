@@ -1,38 +1,27 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import EntryCard from '../../components/EntryCard.astro';
+import SimpleList from '../../components/SimpleList.astro';
 import { getCollection } from 'astro:content';
 
-const essays = (await getCollection('essays', ({ data }) => !data.draft)).sort(
+const entries = (await getCollection('essays', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const items = entries.map((e) => ({
+  href: `/essays/${e.id}/`,
+  title: e.data.title,
+  date: e.data.date,
+  summary: e.data.summary,
+}));
 ---
 
-<BaseLayout title="Essays" description="Longer-form writing: opinions and arguments I've actually reasoned through.">
-  <header class="page-head">
-    <h1>Essays</h1>
-    <p class="muted">Long-form and rare, on purpose. Where the notes get argued into a position.</p>
-  </header>
-
-  <section>
-    {essays.length === 0 && <p class="muted">Nothing here yet.</p>}
-    {essays.map((e) => (
-      <EntryCard
-        href={`/essays/${e.id}/`}
-        title={e.data.title}
-        meta={fmt(e.data.date)}
-        summary={e.data.summary}
-        tags={e.data.tags}
-        pill={e.data.category === 'technical' ? 'Technical' : 'General'}
-      />
-    ))}
-  </section>
+<BaseLayout title="Essays" description="Longer pieces, argued properly." wide={false}>
+  <h1>Essays</h1>
+  <p class="muted intro">Longer pieces, argued properly.</p>
+  <SimpleList items={items} />
 </BaseLayout>
 
 <style>
-  .page-head {
+  .intro {
     margin-bottom: 2rem;
   }
 </style>
