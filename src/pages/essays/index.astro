@@ -15,10 +15,14 @@ const items = entries.map((e) => ({
 
 <BaseLayout title="Essays" description="Longer pieces, argued properly." wide={false}>
   <h2 class="head">Essays</h2>
+  <p class="muted intro">Long-form and rare, on purpose. Where the notes get argued into a position.</p>
   <SimpleList items={items} />
 </BaseLayout>
 
 <style>
+  .intro {
+    margin-bottom: 1.5rem;
+  }
   .head {
     margin: 0 0 1rem;
   }

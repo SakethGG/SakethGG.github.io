@@ -15,10 +15,21 @@ const items = entries.map((e) => ({
 
 <BaseLayout title="Notes" description="Short, informal write-ups and thoughts." wide={false}>
   <h2 class="head">Notes</h2>
+  <p class="muted intro">This is the low-friction pile: loose thoughts and half-formed ideas, not polished essays. Each one is marked <span class="evergreen">evergreen</span> (revised as I learn more) or dated (a snapshot of what I thought at the time).</p>
   <SimpleList items={items} />
 </BaseLayout>
 
 <style>
+  .intro {
+    margin-bottom: 1.5rem;
+  }
+  .evergreen {
+    background: #dce4b8;
+    color: #333333;
+    font-weight: 600;
+    padding: 0.05em 0.35em;
+    border-radius: 3px;
+  }
   .head {
     margin: 0 0 1rem;
   }
