@@ -3,6 +3,9 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
+  <svg class="skyline" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 80 V50 H40 V30 H70 V45 H95 V20 H105 V10 H112 V20 H125 V55 H160 V35 H200 V60 H230 V25 H245 V15 H255 V25 H270 V50 H310 V40 H350 V5 H358 V40 H380 V55 H420 V30 H460 V45 H490 V18 H520 V50 H560 V35 H600 V60 H640 V22 H650 V12 H660 V22 H680 V48 H720 V38 H760 V55 H800 V28 H840 V42 H870 V8 H878 V42 H900 V52 H940 V32 H980 V58 H1020 V26 H1060 V44 H1090 V16 H1110 V50 H1150 V36 H1200 V80 Z" />
+  </svg>
   <div class="wrap-wide bar">
     <p class="muted mono small">&copy; {year} Saketh Vegesna.</p>
     <p class="muted mono small"><a class="plain" href="/contact/">say hello</a></p>
@@ -11,8 +14,16 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
-    border-top: 1px solid var(--border);
     margin-top: 5rem;
+    background: var(--skyline);
+  }
+  .skyline {
+    display: block;
+    width: 100%;
+    height: 70px;
+    margin-bottom: -1px;
+    fill: var(--skyline);
+    background: var(--bg);
   }
   .bar {
     display: flex;

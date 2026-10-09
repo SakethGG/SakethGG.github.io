@@ -90,9 +90,12 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     height: 280px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--border);
+    border: 2px solid var(--accent);
+    box-shadow: var(--glow);
   }
   .intro-text h1 {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.4rem);
     margin: 0 0 0.75rem;
   }
@@ -126,6 +129,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
     margin-bottom: 3rem;
   }
   .door {
+    background: var(--bg-raised);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 1.1rem 1.2rem;
@@ -133,6 +137,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
   }
   .door:hover {
     border-color: var(--accent);
+    box-shadow: var(--glow);
   }
   .door h3 {
     font-size: 1.05rem;

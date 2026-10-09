@@ -1,36 +1,44 @@
 /* ---------------------------------------------------------------------- */
-/* Design tokens: white / black base, red as the only accent             */
+/* Design tokens: Gotham night by default, bat-signal yellow as accent    */
 /* ---------------------------------------------------------------------- */
 
+/* Light ("Wayne Manor"): the yellow is darkened to stay readable on paper */
 :root {
-  --bg: #ffffff;
-  --bg-raised: #f7f6f4;
-  --fg: #121212;
-  --muted: #6b6b6b;
-  --border: #e4e2de;
-  --accent: #d90429;
+  --bg: #f3f2ee;
+  --bg-raised: #e9e7e1;
+  --fg: #14161a;
+  --muted: #5d6168;
+  --border: #d6d3cb;
+  --accent: #8a6400;
   --accent-ink: #ffffff;
-  --code-bg: #f3f1ee;
-  --selection: #ffd6db;
+  --code-bg: #e9e7e1;
+  --selection: #ffe27a;
+  --signal: rgba(138, 100, 0, 0.08);
+  --glow: 0 0 0 1px var(--accent);
+  --skyline: #d6d3cb;
 
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-display: 'Oswald', 'Arial Narrow', Impact, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --max-width: 46rem;
-  --radius: 3px;
+  --radius: 2px;
 }
 
+/* Dark ("Gotham"): the default */
 :root[data-theme='dark'] {
-  --bg: #0b0b0c;
-  --bg-raised: #151517;
-  --fg: #efeeec;
-  --muted: #9c9a97;
-  --border: #2a2a2c;
-  --accent: #ff4b5c;
-  --accent-ink: #0b0b0c;
-  --code-bg: #17171a;
-  --selection: #5c0a14;
+  --bg: #0a0b0e;
+  --bg-raised: #13151a;
+  --fg: #e8e6e1;
+  --muted: #8d9199;
+  --border: #23262d;
+  --accent: #f5c518;
+  --accent-ink: #0a0b0e;
+  --code-bg: #111318;
+  --selection: #4d3f00;
+  --signal: rgba(245, 197, 24, 0.07);
+  --glow: 0 0 18px rgba(245, 197, 24, 0.18);
+  --skyline: #15171c;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -57,6 +65,16 @@ body {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+/* Bat-signal glow cast over the top of the page */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(ellipse 60% 40% at 80% -5%, var(--signal), transparent 70%);
+}
+
 img,
 video {
   max-width: 100%;
@@ -79,7 +97,7 @@ h4 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1.15;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
   margin: 0 0 0.5em;
 }
 

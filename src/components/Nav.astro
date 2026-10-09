@@ -17,7 +17,10 @@ const isActive = (href: string) =>
 
 <header class="site-header">
   <div class="wrap-wide bar">
-    <a href="/" class="plain wordmark">closed loop<span class="dot">.</span></a>
+    <a href="/" class="plain wordmark">
+      <svg class="bat" viewBox="0 0 100 60" aria-hidden="true"><path d="M0 20 C14 18 28 14 38 14 L42 3 L45 11 L55 11 L58 3 L62 14 C72 14 86 18 100 20 C90 24 86 32 88 42 C80 34 70 34 64 42 C58 44 54 50 50 58 C46 50 42 44 36 42 C30 34 20 34 12 42 C14 32 10 24 0 20 Z" /></svg>
+      closed loop
+    </a>
     <nav aria-label="Primary">
       <ul>
         {links.map((l) => (
@@ -46,13 +49,24 @@ const isActive = (href: string) =>
     flex-wrap: wrap;
   }
   .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     white-space: nowrap;
   }
-  .dot {
-    color: var(--accent);
+  .bat {
+    width: 2rem;
+    height: 1.2rem;
+    fill: var(--accent);
+    transition: transform 0.2s ease;
+  }
+  .wordmark:hover .bat {
+    transform: translateY(-2px) scale(1.08);
   }
   nav {
     flex: 1;
