@@ -1,15 +1,70 @@
 ---
-title: "Mini Cheetah Actuator Testbench"
-category: side
-status: paused
-summary: "SAMPLE ENTRY: replace with your real summary. A testbench for characterizing quasi-direct-drive actuators."
-tags: ["actuators", "hardware"]
-date: 2026-03-10
-links: []
+title: "MIT-mini Cheetah Actuator"
+category: archive
+status: shipped
+summary: "A CAD replica of the MIT Mini Cheetah actuator: a compact, torque-dense quasi-direct-drive unit for dynamic legged robots, built mostly from off-the-shelf motor and gear components."
+tags: ["actuators", "hardware", "cad", "legged-robots"]
+date: 2024-11-15
+updated: 2026-05-19
+cover: "/images/projects/mini-cheetah-actuator/isometric_view.png"
+links:
+  - { label: "GitHub", url: "https://github.com/SakethGG/Mini-Cheetah-Actuator" }
 ---
 
-import Placeholder from '../../components/PlaceholderNote.astro';
+A replica of the actuator used in the MIT Mini Cheetah, the small quadruped that made
+quasi-direct-drive actuation popular for agile legged robots. The design goals are the same as the
+original: high torque density, fast response and efficient power delivery in a short, flat
+package that can be bolted straight onto a leg. That makes it a good fit for quadrupeds, bipeds,
+exoskeletons and robotic arms, where you want a lot of torque without much weight.
 
-<Placeholder />
+![](/images/projects/mini-cheetah-actuator/isometric_view.png)
 
-Longer write-up goes here.
+The layout follows the Mini Cheetah: a large-diameter brushless outrunner motor with a low-ratio
+planetary reduction packed inside it, so the gearbox adds almost no length. The low ratio keeps the
+actuator backdrivable, which means the motor current is a good stand-in for output torque and the
+leg can absorb impacts without force sensors. Wherever I could, I designed around off-the-shelf
+motor and gear components to keep it cheap and easy to build.
+
+![](/images/projects/mini-cheetah-actuator/side_view.png)
+
+<video src="/images/projects/mini-cheetah-actuator/video.mp4" controls style="max-width: 100%; border-radius: 8px;"></video>
+
+The control side was planned around field-oriented control (FOC) on an embedded C++ driver, with
+encoder, temperature and real-time feedback for precise torque control.
+
+The full actuator assembly, viewable right here in the browser (drag to orbit, scroll to zoom,
+toggle the cross-section to see inside):
+
+import StepViewer from '../../components/StepViewer.astro';
+
+<StepViewer src="/files/mini-cheetah-actuator/mini_cheetah_actuator_assembly.step" height="520px" />
+
+## Components
+
+The gearbox is a single 6:1 planetary stage (100-tooth ring / 20-tooth sun + 1) built from
+off-the-shelf KHK module 0.5 gears.
+
+| Component | Qty | Notes |
+| --- | --- | --- |
+| Front housing | 1 | Custom, holds the ring gear and output bearing |
+| Back housing with controller housing | 1 | Custom, carries the stator and motor driver |
+| Back plate | 1 | Custom |
+| Stator | 1 | Brushless motor stator with windings |
+| Rotor | 1 | Outrunner rotor with magnets, drives the sun gear |
+| Sun gear holder | 1 | Custom, couples the rotor to the sun gear |
+| KHK GEAB0.5-20-8-K-4 | 1 | Sun gear, module 0.5, 20 teeth |
+| KHK GEFHB0.5-40-5-8-W3-H10 | 3 | Planet gears, module 0.5, 40 teeth |
+| KHK SI0.5-100 | 1 | Internal ring gear, module 0.5, 100 teeth |
+| Planetary top plate | 1 | Custom planet carrier, output side |
+| Planetary bottom plate | 1 | Custom planet carrier |
+| 4 x 20 mm dowel pin | 3 | Planet shafts |
+| HK0408 needle bearing | 3 | Planet gear bearings |
+| 6708 ball bearing | 1 | Thin-section output bearing |
+| 6702 ball bearing | 2 | Thin-section rotor/carrier bearings |
+| 624H ball bearing | 1 | Small support bearing |
+
+The repository has the full CAD: SolidWorks part and assembly files plus STEP exports. I put it
+together so students, researchers and developers can see how the Mini Cheetah actuator is built
+and use it as a starting point for their own.
+
+Repository: [github.com/SakethGG/Mini-Cheetah-Actuator](https://github.com/SakethGG/Mini-Cheetah-Actuator)
