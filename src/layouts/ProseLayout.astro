@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Vote from '../components/Vote.astro';
 
 interface Props {
   title: string;
@@ -10,9 +11,10 @@ interface Props {
   tags?: string[];
   backHref?: string;
   backLabel?: string;
+  readsKey?: string;
 }
 
-const { title, description, eyebrow, date, updated, tags = [], backHref, backLabel } = Astro.props;
+const { title, description, eyebrow, date, updated, tags = [], backHref, backLabel, readsKey } = Astro.props;
 
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -30,6 +32,7 @@ const fmt = (d: Date) =>
         <p class="muted mono meta">
           {date && fmt(date)}
           {updated && <> · updated {fmt(updated)}</>}
+          {readsKey && <span class="reads" data-reads={readsKey} data-reads-hit></span>}
         </p>
       )}
       {tags.length > 0 && (
@@ -43,6 +46,7 @@ const fmt = (d: Date) =>
     <div class="prose-body">
       <slot />
     </div>
+    {readsKey && <Vote readsKey={readsKey} />}
   </article>
 </BaseLayout>
 

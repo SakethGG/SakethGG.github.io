@@ -61,6 +61,37 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
     <Footer />
+    <script>
+      // Read counts: every [data-reads] element gets its count filled in.
+      // Post pages also carry [data-reads-hit], which adds one read per browser.
+      const API = 'https://abacus.jasoncameron.dev';
+      const NS = 'sakethgg-closed-loop';
+      const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
+
+      document.querySelectorAll<HTMLElement>('[data-reads]').forEach(async (el) => {
+        const key = el.dataset.reads!;
+        const seenKey = `read:${key}`;
+        let seen = false;
+        try {
+          seen = localStorage.getItem(seenKey) === '1';
+        } catch {}
+        const hit = el.hasAttribute('data-reads-hit') && !seen && !isLocal;
+
+        try {
+          const res = await fetch(`${API}/${hit ? 'hit' : 'get'}/${NS}/${key}`);
+          let count: number;
+          if (res.ok) count = (await res.json()).value;
+          else if (res.status === 404) count = 0;
+          else return;
+          if (hit) {
+            try {
+              localStorage.setItem(seenKey, '1');
+            } catch {}
+          }
+          el.textContent = `${count.toLocaleString()} ${count === 1 ? 'read' : 'reads'}`;
+        } catch {}
+      });
+    </script>
     <style>
       main {
         padding: 3rem 0 4rem;

@@ -1,0 +1,123 @@
+---
+interface Props {
+  readsKey: string;
+}
+
+const { readsKey } = Astro.props;
+---
+
+<div class="vote" data-vote={readsKey}>
+  <p class="vote-prompt muted">Was this worth reading?</p>
+  <div class="vote-buttons">
+    <button type="button" class="vote-btn" data-dir="up" aria-label="Upvote">
+      <span aria-hidden="true">▲</span> <span class="vote-count mono"></span>
+    </button>
+    <button type="button" class="vote-btn" data-dir="down" aria-label="Downvote">
+      <span aria-hidden="true">▼</span> <span class="vote-count mono"></span>
+    </button>
+  </div>
+</div>
+
+<script>
+  // Up/down votes, stored as two counters per post. One vote per browser;
+  // the counter service can't decrement, so a vote can't be changed once cast.
+  const API = 'https://abacus.jasoncameron.dev';
+  const NS = 'sakethgg-closed-loop';
+  const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
+
+  const getCount = async (path: string) => {
+    const res = await fetch(`${API}/${path}`);
+    if (res.ok) return (await res.json()).value as number;
+    if (res.status === 404) return 0;
+    throw new Error(`counter ${res.status}`);
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-vote]').forEach((box) => {
+    const key = box.dataset.vote!;
+    const storeKey = `vote:${key}`;
+    const buttons = [...box.querySelectorAll<HTMLButtonElement>('.vote-btn')];
+    const countEl = (btn: HTMLButtonElement) => btn.querySelector('.vote-count')!;
+
+    let voted: string | null = null;
+    try {
+      voted = localStorage.getItem(storeKey);
+    } catch {}
+
+    const lock = (dir: string) => {
+      buttons.forEach((b) => {
+        b.disabled = true;
+        b.setAttribute('aria-pressed', String(b.dataset.dir === dir));
+      });
+    };
+    if (voted) lock(voted);
+
+    buttons.forEach(async (btn) => {
+      try {
+        countEl(btn).textContent = String(await getCount(`get/${NS}/${key}-${btn.dataset.dir}`));
+      } catch {}
+
+      btn.addEventListener('click', async () => {
+        if (voted) return;
+        const dir = btn.dataset.dir!;
+        voted = dir;
+        lock(dir);
+        try {
+          localStorage.setItem(storeKey, dir);
+        } catch {}
+        try {
+          countEl(btn).textContent = isLocal
+            ? String(Number(countEl(btn).textContent || 0) + 1)
+            : String(await getCount(`hit/${NS}/${key}-${dir}`));
+        } catch {}
+      });
+    });
+  });
+</script>
+
+<style>
+  .vote {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .vote-prompt {
+    margin: 0;
+  }
+  .vote-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .vote-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .vote-btn:hover:not(:disabled),
+  .vote-btn[aria-pressed='true'] {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .vote-btn:disabled {
+    cursor: default;
+  }
+  .vote-btn:disabled:not([aria-pressed='true']) {
+    opacity: 0.5;
+  }
+  .vote-count:empty {
+    display: none;
+  }
+</style>

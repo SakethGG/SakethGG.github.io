@@ -1,6 +1,7 @@
 ---
 import ProseLayout from '../../layouts/ProseLayout.astro';
 import { getCollection, render } from 'astro:content';
+import { readsKey } from '../../utils/reads';
 
 export async function getStaticPaths() {
   const entries = await getCollection('notes', ({ data }) => !data.draft);
@@ -24,6 +25,7 @@ const { Content } = await render(entry);
   tags={data.tags}
   backHref="/notes/"
   backLabel="All notes"
+  readsKey={readsKey('notes', entry.id)}
 >
   <Content />
 </ProseLayout>
